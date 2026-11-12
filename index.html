@@ -385,6 +385,7 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .pay-box button{min-height:46px;border-radius:6px;border:1px solid #c9ced8;background:#fff;color:#1b2333;font:500 .9rem var(--font-body);cursor:pointer}
 .pay-box input{min-height:42px;border:1px solid #c9ced8;border-radius:6px;padding:0 10px;font:400 .9rem var(--font-body);color:#1b2333 !important;background:#fff !important;width:100%;box-sizing:border-box}
 .pay-box label{font:500 .72rem var(--font-body);color:#6b7385}
+.pp-sum{margin:10px 0}.pp-sum tr.hl td{color:inherit;font-weight:700}.pp-sum td:first-child{white-space:normal;width:auto}.pp-sum td:last-child{white-space:nowrap;text-align:right;width:1%;padding-left:14px}.pp-card .pp-sum td:last-child{white-space:normal;text-align:left;width:auto;padding-left:8px}.pp-card{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;margin:0 0 12px}.pp-card h4{margin:0 0 6px}.pp-card .pp-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0}.pp-card .pp-bar i{display:block;height:100%;background:#c9a24b}.pb-photo{margin:10px 0 4px}.pb-photo input[type=file]{width:100%;font-size:.9rem}.pb-prev{display:block;max-width:100%;max-height:200px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,.18)}.pf-view{max-width:min(92vw,560px);max-height:80vh;overflow:auto}.pf-view img{display:block;width:100%;height:auto;margin:10px 0;border-radius:8px}
 .bank-t{border-collapse:collapse;width:100%;font-size:.86rem}.bank-t td{padding:5px 0;vertical-align:top}.bank-t td:first-child{color:#6b7385;padding-right:14px;white-space:nowrap}.bank-t td:last-child{font-weight:600;user-select:all;word-break:break-all}
 .pay-box button.ok{background:#1b2333;color:#fff;border-color:#1b2333}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:400;background:var(--gold);color:#1a1405;padding:12px 20px;border-radius:999px;font-size:.82rem;max-width:calc(100vw - 32px);text-align:center}
@@ -615,7 +616,7 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <div class="modal">
     <h3 id="m-title">Your package</h3>
-    <p>Checkout creates an invoice in your client portal and shows our bank details. You pay by bank transfer, and we confirm as soon as the money reaches our account.</p>
+    <p>Checkout creates an invoice in your client portal and shows our bank details. For one-time packages you pay a 45% deposit now and the balance when your package is finished. Monthly plans are invoiced monthly. You pay by bank transfer, and we confirm as soon as the money reaches our account.</p>
     <div class="sum"><span id="m-plan"></span><strong id="m-price"></strong></div>
     <div class="btns"><button class="btn gold small" type="button" id="m-co">Checkout</button><a class="btn small" href="#contact" id="m-go">Continue to contact</a><button class="btn small" type="button" id="m-close">Close</button></div>
   </div>
@@ -990,6 +991,15 @@ window.API=(function(){
     return j;
   };
   A.get=function(p){return A.call('GET',p)};
+  A.upload=async function(path,blob){
+    var h={'content-type':blob.type||'application/octet-stream'};if(tok)h.authorization='Bearer '+tok;
+    var r;
+    try{r=await fetch(base+path,{method:'POST',headers:h,body:blob})}
+    catch(e){throw {status:0,error:'network',message:'Could not reach the server. Check your connection and try again.'}}
+    var j=null;try{j=await r.json()}catch(e){}
+    if(!r.ok)throw {status:r.status,error:j&&j.error,message:(j&&j.message)||'The upload failed. Please try again.'};
+    return j;
+  };
   A.post=function(p,b){return A.call('POST',p,b===undefined?{}:b)};
   A.download=async function(path,name){
     var blob=await A.call('GET',path,undefined,{blob:true});
@@ -1751,19 +1761,41 @@ window.API=(function(){
   function showBankPanel(r,inv,after){
     var b=r.bank||{},rows=[['Bank',b.bankName],['Account name',b.accountName],['Account number',b.accountNumber],['SWIFT / BIC',b.swift],['Branch',b.branch],['Currency',r.currency],['Payment reference',r.reference]].filter(function(x){return x[1]});
     var h='<h4>Pay by bank transfer</h4><div>'+esc(inv.desc)+'<br><small>'+esc(inv.id)+'</small></div><div class="amt">'+usd(inv.amount)+'</div>';
+    var pj=inv.project;
+    if(pj){
+      var thisPay=inv.amount,rest=Math.max(0,pj.remaining-thisPay),paidSoFar=Math.max(0,pj.total-pj.remaining);
+      h+='<table class="bank-t pp-sum"><tr><td>Package total</td><td>'+usd(pj.total)+'</td></tr>'+
+        (pj.role==='balance'?'<tr><td>Already paid (deposit)</td><td>'+usd(paidSoFar)+'</td></tr>':'')+
+        '<tr class="hl"><td>This payment ('+(pj.role==='deposit'?'deposit':'final balance')+')</td><td>'+usd(thisPay)+'</td></tr>'+
+        '<tr><td>'+(pj.role==='deposit'?'Balance still to pay (due when your package is finished)':'Remaining after this payment')+'</td><td>'+usd(rest)+'</td></tr></table>';
+    }
     if(r.ready){
       h+='<table class="bank-t">'+rows.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>'}).join('')+'</table>';
       h+='<div class="demo">Please put <strong>'+esc(r.reference)+'</strong> as the payment reference so we can match your payment, and send the full amount (bank fees on your side are yours to cover).'+(b.note?' '+esc(b.note):'')+'</div>';
-      h+='<label for="pb-ref">Your bank reference or transaction number (optional)</label><input id="pb-ref" maxlength="80" autocomplete="off"><button class="ok" id="pb-sent">I have sent the transfer</button>';
+      h+='<label for="pb-ref">Your bank reference or transaction number (optional)</label><input id="pb-ref" maxlength="80" autocomplete="off"><div class="pb-photo"><label for="pb-photo">Photo of your proof of payment (optional, but it speeds up confirmation)</label><input id="pb-photo" type="file" accept="image/*"><img class="pb-prev" id="pb-prev" alt="Preview of your proof of payment" hidden></div><button class="ok" id="pb-sent">I have sent the transfer</button>';
     }else h+='<div class="demo">Our bank details are not available online yet. Please contact us and we will send them straight away.</div>';
     h+='<button id="pb-cx">Close</button>';
     box.innerHTML=h;ov.classList.add('show');
     function close(){ov.classList.remove('show');if(after)after()}
     document.getElementById('pb-cx').onclick=close;
-    var sent=document.getElementById('pb-sent');
+    var sent=document.getElementById('pb-sent'),pf=document.getElementById('pb-photo'),pv=document.getElementById('pb-prev'),shot=null;
+    /* Shrinks a phone photo to about 1600px wide JPEG (usually 200 to 500 KB) so it uploads quickly on mobile data. */
+    function shrink(file){return new Promise(function(res,rej){
+      var url=URL.createObjectURL(file),im=new Image();
+      im.onload=function(){var m=1600,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,m/Math.max(w,h)),c=document.createElement('canvas');
+        c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+        URL.revokeObjectURL(url);c.toBlob(function(b){b?res(b):rej(new Error('encode'))},'image/jpeg',0.82)};
+      im.onerror=function(){URL.revokeObjectURL(url);rej(new Error('decode'))};im.src=url})}
+    if(pf)pf.onchange=async function(){shot=null;pv.hidden=true;var f=pf.files&&pf.files[0];if(!f)return;
+      if(f.type&&f.type.indexOf('image/')!==0){toast('Please choose a photo (an image file).');pf.value='';return}
+      try{shot=await shrink(f);if(shot.size>5*1024*1024){shot=null;pf.value='';toast('That photo is too large. Please choose a smaller one.');return}
+        pv.src=URL.createObjectURL(shot);pv.hidden=false}
+      catch(e){shot=null;pf.value='';toast('We could not read that photo. Please try a screenshot or a JPG photo instead.')}};
     if(sent)sent.onclick=async function(){sent.disabled=true;
-      try{await API.post('/api/portal/invoices/'+encodeURIComponent(inv.id)+'/transfer-sent',{reference:document.getElementById('pb-ref').value.trim()});toast('Thank you. We will confirm your payment as soon as the money reaches our account.');close()}
-      catch(e){sent.disabled=false;toast(API.text(e))}};
+      try{
+        if(shot){sent.textContent='Uploading photo…';await API.upload('/api/portal/invoices/'+encodeURIComponent(inv.id)+'/proof',shot)}
+        await API.post('/api/portal/invoices/'+encodeURIComponent(inv.id)+'/transfer-sent',{reference:document.getElementById('pb-ref').value.trim()});toast('Thank you. We will confirm your payment as soon as the money reaches our account.');close()}
+      catch(e){sent.disabled=false;sent.textContent='I have sent the transfer';toast(API.text(e))}};
   }
   async function payInvoice(inv,after){
     try{
@@ -1803,7 +1835,20 @@ window.API=(function(){
     h+='<h3 class="sec">Services</h3><div class="al-table"><table><thead><tr><th>Service</th><th>Price</th><th>Status</th><th>Next billing</th><th></th></tr></thead><tbody>';
     if(!subs.length)h+='<tr><td colspan="5">No services yet. Choose a package in the pricing section.</td></tr>';
     subs.forEach(function(x){var mk=/^Marketing /.test(x.plan);h+='<tr><td><strong>'+esc(x.plan)+'</strong></td><td>'+usd(x.amount)+' / month</td><td><span class="st '+esc(x.status)+'">'+esc(x.status)+'</span></td><td>'+(x.status==='cancelled'?'-':fmt(x.next))+'</td><td><div class="bp-act">'+(x.status==='cancelled'?'':(mk?'<select data-chg="'+esc(x.id)+'" aria-label="Change plan">'+['Essential','Growth','Scale'].map(function(n){return '<option'+(x.plan==='Marketing '+n?' selected':'')+'>Marketing '+n+'</option>'}).join('')+'</select>':'')+'<button class="btn mini" data-cx="'+esc(x.id)+'" type="button">Cancel</button>')+'</div></td></tr>'});
-    h+='</tbody></table></div><h3 class="sec">Invoices</h3><div class="al-table"><table><thead><tr><th>Invoice</th><th>Description</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>';
+    h+='</tbody></table></div>';
+    if(d.projects&&d.projects.length){
+      h+='<h3 class="sec">Project payments</h3>'+d.projects.map(function(p){
+        var pct=p.total>0?Math.round(p.paid/p.total*100):0,
+          bal=p.balanceStatus==='not_due'?'Invoiced when your package is finished':('Invoice '+esc(p.balanceInvoice)+': <span class="st '+esc(p.balanceStatus)+'">'+esc(p.balanceStatus)+'</span>'),
+          dep='Invoice '+esc(p.depositInvoice)+': <span class="st '+esc(p.depositStatus||'void')+'">'+esc(p.depositStatus||'void')+'</span>';
+        return '<div class="pp-card"><h4>'+esc(p.desc)+'</h4><div class="pp-bar" role="img" aria-label="'+pct+'% paid"><i style="width:'+pct+'%"></i></div>'+
+          '<table class="bank-t pp-sum"><tr><td>Package total</td><td>'+usd(p.total)+'</td></tr>'+
+          '<tr><td>Deposit ('+usd(p.deposit)+')</td><td>'+dep+'</td></tr>'+
+          '<tr><td>Final balance ('+usd(p.balance)+')</td><td>'+bal+'</td></tr>'+
+          '<tr class="hl"><td>Paid so far</td><td>'+usd(p.paid)+'</td></tr>'+
+          '<tr class="hl"><td>Still to pay</td><td>'+usd(p.remaining)+'</td></tr></table></div>'}).join('');
+    }
+    h+='<h3 class="sec">Invoices</h3><div class="al-table"><table><thead><tr><th>Invoice</th><th>Description</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>';
     if(!invs.length)h+='<tr><td colspan="6">No invoices yet.</td></tr>';
     invs.forEach(function(i){h+='<tr><td><strong>'+esc(i.id)+'</strong></td><td>'+esc(i.desc)+'</td><td>'+usd(i.amount)+'</td><td>'+fmt(i.due)+'</td><td><span class="st '+istat(i)+'">'+istat(i)+'</span>'+(i.status==='unpaid'&&i.transferReportedAt?'<br><small>Transfer reported, waiting for the money to arrive</small>':'')+'</td><td><div class="bp-act">'+(i.status==='unpaid'?'<button class="btn gold mini" data-pay="'+esc(i.id)+'" type="button">Pay by bank transfer</button><button class="btn mini" data-link="'+esc(i.id)+'" type="button">Copy link</button>':'')+'<button class="btn mini" data-dl="'+esc(i.id)+'" type="button">'+(i.status==='paid'?'Receipt':'Invoice')+'</button></div></td></tr>'});
     h+='</tbody></table></div><h3 class="sec">Payment history</h3><div class="al-table"><table><thead><tr><th>Date</th><th>Invoice</th><th>Amount</th><th>Method</th><th>Result</th></tr></thead><tbody>';
@@ -1889,7 +1934,7 @@ window.API=(function(){
     h+='<h3 class="sec">Create invoice</h3>'+(clients.length?'<form class="bp-form" id="ba-form"><div><label for="ba-c">Client</label><select id="ba-c">'+clients.map(function(c){return '<option value="'+esc(c.id)+'">'+esc(c.name)+' ('+esc(c.email)+')</option>'}).join('')+'</select></div><div><label for="ba-d">Description</label><input id="ba-d" required maxlength="80" placeholder="e.g. Logo refresh"></div><div><label for="ba-a">Amount (USD)</label><input id="ba-a" type="number" min="0.01" step="0.01" required></div><div><label for="ba-due">Due in days</label><input id="ba-due" type="number" min="0" max="365" value="7"></div><div><button class="btn gold small" type="submit">Create and email</button></div></form>':'<p class="lead">No client accounts yet. Clients appear here after they sign up, or invite one below.</p>');
     h+='<h3 class="sec">Invite a client</h3><form class="bp-form" id="ba-inv"><div><label for="bi-n">Name</label><input id="bi-n" required maxlength="100"></div><div><label for="bi-e">Email</label><input id="bi-e" type="email" required></div><div><button class="btn small" type="submit">Send invitation</button></div></form>';
     h+='<h3 class="sec">Invoices</h3><div class="al-bar"><span class="grow">'+invs.length+' invoices</span><button class="btn small" id="ba-csv" type="button">Export CSV</button></div><div class="al-table"><table><thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-    invs.forEach(function(i){h+='<tr><td><strong>'+esc(i.id)+'</strong><br><small>'+esc(i.desc)+'</small>'+(i.status==='unpaid'&&i.transferReportedAt?'<br><small><strong>Client says they have paid</strong> ('+fmt(i.transferReportedAt)+(i.transferReference?', ref '+esc(i.transferReference):'')+'). Check your bank account.</small>':'')+'</td><td>'+esc(i.clientName)+'</td><td>'+usd(i.amount)+'</td><td>'+fmt(i.due)+'</td><td><span class="st '+istat(i)+'">'+istat(i)+'</span></td><td><div class="bp-act">'+(i.status==='unpaid'?'<button class="btn mini" data-mp="'+esc(i.id)+'" type="button">Mark paid (money received)</button><button class="btn mini" data-vd="'+esc(i.id)+'" type="button">Void</button>':'')+(i.status==='paid'?'<button class="btn mini" data-rf="'+esc(i.id)+'" type="button">Refund</button>':'')+'</div></td></tr>'});
+    invs.forEach(function(i){h+='<tr><td><strong>'+esc(i.id)+'</strong><br><small>'+esc(i.desc)+'</small>'+(i.project?'<br><small>Package '+usd(i.project.total)+(i.project.role==='deposit'?' | balance '+usd(i.project.balance)+(i.project.balanceInvoice?' invoiced as '+esc(i.project.balanceInvoice):' not invoiced yet'):' | final balance (deposit '+usd(i.project.deposit)+')')+'</small>':'')+(i.status==='unpaid'&&i.transferReportedAt?'<br><small><strong>Client says they have paid</strong> ('+fmt(i.transferReportedAt)+(i.transferReference?', ref '+esc(i.transferReference):'')+'). Check your bank account.</small>':'')+(i.status==='unpaid'&&i.proofCount?'<br><button class="btn mini" data-pf="'+esc(i.id)+'" type="button">View proof ('+i.proofCount+')</button>':'')+'</td><td>'+esc(i.clientName)+'</td><td>'+usd(i.amount)+'</td><td>'+fmt(i.due)+'</td><td><span class="st '+istat(i)+'">'+istat(i)+'</span></td><td><div class="bp-act">'+(i.status==='unpaid'?'<button class="btn mini" data-mp="'+esc(i.id)+'" type="button">Mark paid (money received)</button><button class="btn mini" data-vd="'+esc(i.id)+'" type="button">Void</button>':'')+(i.status==='paid'&&i.project&&i.project.role==='deposit'&&!i.project.balanceInvoice?'<button class="btn mini gold" data-ib="'+esc(i.id)+'" type="button">Package finished: invoice the balance ('+usd(i.project.balance)+')</button>':'')+(i.status==='paid'?'<button class="btn mini" data-rf="'+esc(i.id)+'" type="button">Refund</button>':'')+'</div></td></tr>'});
     h+='</tbody></table></div><p class="bk-note">Refunds recorded here are bookkeeping only. Send the money back from the bank.</p>';
     h+='<h3 class="sec">Monthly services</h3><div class="al-bar"><span class="grow">Invoices are issued automatically every hour when a billing date arrives.</span><button class="btn small" id="ba-run" type="button">Run monthly billing now</button></div><div class="al-table"><table><thead><tr><th>Service</th><th>Client</th><th>Price</th><th>Next billing</th><th>Status</th></tr></thead><tbody>';
     if(!subs.length)h+='<tr><td colspan="5">No services yet.</td></tr>';
@@ -1904,7 +1949,15 @@ window.API=(function(){
       try{await API.post('/api/admin/clients',{name:document.getElementById('bi-n').value.trim(),email:document.getElementById('bi-e').value.trim()});toast('Invitation sent.')}catch(er){toast(API.text(er))}openBilling()};
     function simple(attr,path,msg,arm){body.querySelectorAll('['+attr+']').forEach(function(b){b.onclick=async function(){if(arm&&!b.dataset.armed){b.dataset.armed=1;b.textContent='Confirm '+arm;return}
       try{await API.post('/api/admin/invoices/'+encodeURIComponent(b.getAttribute(attr))+path);toast(msg)}catch(er){toast(API.text(er))}openBilling()}})}
-    simple('data-mp','/mark-paid','Marked paid manually.');simple('data-rf','/refund','Refund recorded.','refund');simple('data-vd','/void','Invoice voided.','void');
+    body.querySelectorAll('[data-pf]').forEach(function(b){b.onclick=async function(){
+      var id=b.getAttribute('data-pf'),urls=[];b.disabled=true;
+      try{var l=await API.get('/api/admin/invoices/'+encodeURIComponent(id)+'/proofs');
+        for(var k=0;k<l.proofs.length;k++){var bl=await API.call('GET','/api/admin/proofs/'+l.proofs[k].id,undefined,{blob:true});urls.push([URL.createObjectURL(bl),l.proofs[k].at])}
+        var h2='<h4>Proof of payment for '+esc(id)+'</h4><div class="pf-view">'+urls.map(function(u){return '<small>Sent '+fmt(u[1])+'</small><img src="'+u[0]+'" alt="Proof of payment photo">'}).join('')+'</div><button id="pf-cx">Close</button>';
+        box.innerHTML=h2;ov.classList.add('show');
+        document.getElementById('pf-cx').onclick=function(){ov.classList.remove('show');box.innerHTML='';urls.forEach(function(u){URL.revokeObjectURL(u[0])})}}
+      catch(er){toast(API.text(er))}b.disabled=false}});
+    simple('data-mp','/mark-paid','Marked paid manually.');simple('data-ib','/invoice-balance','Balance invoice created and emailed to the client.','balance invoice');simple('data-rf','/refund','Refund recorded.','refund');simple('data-vd','/void','Invoice voided.','void');
     body.querySelectorAll('[data-ss]').forEach(function(s){s.onchange=async function(){try{await API.call('PATCH','/api/admin/subscriptions/'+encodeURIComponent(s.dataset.ss),{status:s.value});toast('Status saved.')}catch(er){toast(API.text(er))}openBilling()}});
     document.getElementById('ba-run').onclick=async function(){try{var r=await API.post('/api/admin/billing/run');toast(r.invoiced.length+' invoice(s) issued, '+r.markedOverdue+' service(s) marked overdue.')}catch(er){toast(API.text(er))}openBilling()};
     document.getElementById('ba-csv').onclick=function(){API.download('/api/admin/invoices.csv','vintage-invoices.csv').catch(function(er){toast(API.text(er))})};
