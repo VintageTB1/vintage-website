@@ -366,6 +366,7 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .bp-card{border:1px solid var(--silver-dim);border-radius:4px;padding:22px;min-width:0}
 .bp-card small{display:block;font:500 .62rem var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
 .bp-card b{font:500 2rem var(--font-head);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.bp-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}.bp-card{padding:12px 14px}.bp-card b{font-size:1.45rem}.bp-card small{margin-bottom:4px;letter-spacing:.12em}}
 .st{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;border:1px solid;white-space:nowrap}
 .st.paid,.st.active,.st.succeeded{color:#9fd3b0;border-color:#9fd3b0}
 .st.unpaid,.st.due,.st.pending{color:var(--gold);border-color:var(--gold)}
@@ -376,11 +377,12 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .bp-form input,.bp-form select{width:100%;background:rgba(10,18,38,.6);border:1px solid var(--silver-dim);border-radius:3px;color:var(--white);font:300 .95rem var(--font-body);padding:12px 14px;min-height:46px}
 .bp-form label{display:block;font:500 .62rem var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--silver);margin-bottom:6px}
 .bp-tabs{display:flex;gap:6px;margin-top:22px;flex-wrap:wrap}
-.pay-ov{position:fixed;inset:0;z-index:170;background:rgba(5,9,20,.85);display:none;place-items:center;padding:20px}
-.pay-ov.show{display:grid}
-.pay-box{background:#fff;color:#1b2333;border-radius:8px;max-width:420px;width:100%;padding:30px;display:grid;gap:14px;font-family:var(--font-body)}
+.pay-ov{position:fixed;inset:0;z-index:170;background:rgba(5,9,20,.85);display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.pay-ov.show{display:flex}
+.pay-box{background:#fff;color:#1b2333;border-radius:10px;max-width:440px;width:100%;box-sizing:border-box;margin:auto;padding:clamp(16px,4vw,26px);display:grid;grid-template-columns:minmax(0,1fr);gap:10px;font-family:var(--font-body)}
+.pay-box>*{min-width:0;max-width:100%}.pay-box p{margin:0}
 .pay-box h4{font:600 1.1rem var(--font-body);margin:0}
-.pay-box .amt{font:600 2rem var(--font-body)}
+.pay-box .amt{font:600 clamp(1.5rem,6vw,1.9rem) var(--font-body);line-height:1.1}
 .pay-box .demo{background:#fff4d6;border:1px solid #e6c96a;color:#6b5200;font-size:.78rem;padding:10px 12px;border-radius:4px}
 .pay-box button{min-height:46px;border-radius:6px;border:1px solid #c9ced8;background:#fff;color:#1b2333;font:500 .9rem var(--font-body);cursor:pointer}
 .pay-box input{min-height:42px;border:1px solid #c9ced8;border-radius:6px;padding:0 10px;font:400 .9rem var(--font-body);color:#1b2333 !important;background:#fff !important;width:100%;box-sizing:border-box}
@@ -388,6 +390,10 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .pp-sum{margin:10px 0}.pp-sum tr.hl td{color:inherit;font-weight:700}.pp-sum td:first-child{white-space:normal;width:auto}.pp-sum td:last-child{white-space:nowrap;text-align:right;width:1%;padding-left:14px}.pp-card .pp-sum td:last-child{white-space:normal;text-align:left;width:auto;padding-left:8px}.pp-card{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;margin:0 0 12px}.pp-card h4{margin:0 0 6px}.pp-card .pp-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0}.pp-card .pp-bar i{display:block;height:100%;background:#c9a24b}.pb-photo{margin:10px 0 4px}.pb-photo input[type=file]{width:100%;font-size:.9rem}.pb-prev{display:block;max-width:100%;max-height:200px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,.18)}.pf-view{max-width:min(92vw,560px);max-height:80vh;overflow:auto}.pf-view img{display:block;width:100%;height:auto;margin:10px 0;border-radius:8px}
 .bank-t{border-collapse:collapse;width:100%;font-size:.86rem}.bank-t td{padding:5px 0;vertical-align:top}.bank-t td:first-child{color:#6b7385;padding-right:14px;white-space:nowrap}.bank-t td:last-child{font-weight:600;user-select:all;word-break:break-all}
 .pay-box button.ok{background:#1b2333;color:#fff;border-color:#1b2333}
+.pp-sum.bank-t td:first-child{white-space:normal;padding-right:10px}.pp-sum.bank-t td:last-child{word-break:normal}.pay-box .pp-sum{margin:2px 0}.pay-box .bank-t td{padding:4px 0}.pay-box .pb-photo input[type=file]{box-sizing:border-box;min-height:0;padding:8px 10px}
+@media (max-height:760px){.pay-box{gap:8px;padding:16px 18px}.pay-box button{min-height:42px}.pay-box .bank-t{font-size:.82rem}.pay-box .demo{font-size:.74rem;padding:8px 10px}}
+@media (min-width:720px) and (max-height:820px){.pay-box{max-width:840px;display:block;column-count:2;column-gap:28px}.pay-box>*{break-inside:avoid;margin:0 0 9px}.pay-box>button{width:100%}}
+@media (max-width:380px){.pay-box .bank-t td:first-child{white-space:normal}}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:400;background:var(--gold);color:#1a1405;padding:12px 20px;border-radius:999px;font-size:.82rem;max-width:calc(100vw - 32px);text-align:center}
 
 /* ===== MILESTONE 4: Vintage Books ===== */
