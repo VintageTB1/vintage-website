@@ -387,10 +387,24 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .pay-box button{min-height:46px;border-radius:6px;border:1px solid #c9ced8;background:#fff;color:#1b2333;font:500 .9rem var(--font-body);cursor:pointer}
 .pay-box input{min-height:42px;border:1px solid #c9ced8;border-radius:6px;padding:0 10px;font:400 .9rem var(--font-body);color:#1b2333 !important;background:#fff !important;width:100%;box-sizing:border-box}
 .pay-box label{font:500 .72rem var(--font-body);color:#6b7385}
-.pp-sum{margin:10px 0}.pp-sum tr.hl td{color:inherit;font-weight:700}.pp-sum td:first-child{white-space:normal;width:auto}.pp-sum td:last-child{white-space:nowrap;text-align:right;width:1%;padding-left:14px}.pp-card .pp-sum td:last-child{white-space:normal;text-align:left;width:auto;padding-left:8px}.pp-card{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;margin:0 0 12px}.pp-card h4{margin:0 0 6px}.pp-card .pp-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0}.pp-card .pp-bar i{display:block;height:100%;background:#c9a24b}.pb-photo{margin:10px 0 4px}.pb-photo input[type=file]{width:100%;font-size:.9rem}.pb-prev{display:block;max-width:100%;max-height:200px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,.18)}.pf-view{max-width:min(92vw,560px);max-height:80vh;overflow:auto}.pf-view img{display:block;width:100%;height:auto;margin:10px 0;border-radius:8px}
+.pp-sum{margin:10px 0}.pp-sum tr.hl td{color:inherit;font-weight:700}.pp-sum td:first-child{white-space:normal;width:auto}.pp-sum td:last-child{white-space:nowrap;text-align:right;width:1%;padding-left:14px}.pp-card .pp-sum td:last-child{white-space:normal;text-align:left;width:auto;padding-left:8px}.pp-card{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;margin:0 0 12px}.pp-card h4{margin:0 0 6px}.pp-card .pp-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0}.pp-card .pp-bar i{display:block;height:100%;background:#c9a24b}.pf-view{max-width:min(92vw,560px);max-height:80vh;overflow:auto}.pf-view img{display:block;width:100%;height:auto;margin:10px 0;border-radius:8px}
 .bank-t{border-collapse:collapse;width:100%;font-size:.86rem}.bank-t td{padding:5px 0;vertical-align:top}.bank-t td:first-child{color:#6b7385;padding-right:14px;white-space:nowrap}.bank-t td:last-child{font-weight:600;user-select:all;word-break:break-all}
 .pay-box button.ok{background:#1b2333;color:#fff;border-color:#1b2333}
-.pp-sum.bank-t td:first-child{white-space:normal;padding-right:10px}.pp-sum.bank-t td:last-child{word-break:normal}.pay-box .pp-sum{margin:2px 0}.pay-box .bank-t td{padding:4px 0}.pay-box .pb-photo input[type=file]{box-sizing:border-box;min-height:0;padding:8px 10px}
+.pb-photo{display:grid;gap:7px;margin:2px 0}
+.pb-lab{font:600 .82rem/1.3 var(--font-body);color:#1b2333}.pb-lab span{font-weight:400;color:#6b7385}
+.pb-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
+.pb-drop{display:flex;align-items:center;gap:14px;box-sizing:border-box;min-height:64px;padding:12px 16px;border:1.5px dashed #aab2c3;border-radius:12px;background:#f7f8fb;color:#1b2333;cursor:pointer;transition:background .15s,border-color .15s;-webkit-tap-highlight-color:transparent}
+.pb-drop:hover,.pb-drop:active,.pb-file:focus-visible+.pb-drop{border-color:#1b2333;background:#eef1f7}
+.pb-drop[hidden],.pb-got[hidden]{display:none}
+.pay-box .pb-drop{color:#1b2333;font:inherit}.pay-box .pb-drop b{color:#1b2333}.pay-box .pb-drop small{color:#6b7385}
+.pb-drop svg{flex:none;width:30px;height:30px}
+.pb-drop b{display:block;font:600 .9rem/1.25 var(--font-body)}.pb-drop small{display:block;margin-top:2px;font:400 .76rem/1.3 var(--font-body);color:#6b7385}
+.pb-drop.busy{opacity:.7;pointer-events:none}
+.pb-got{display:flex;align-items:center;gap:12px;box-sizing:border-box;padding:8px 10px 8px 8px;border:1px solid #bfdcc8;border-radius:12px;background:#f1f9f3}
+.pb-got img{flex:none;width:58px;height:58px;object-fit:cover;border-radius:8px;border:1px solid #d5e5da;background:#fff}
+.pb-got>div{flex:1;min-width:0}.pb-got b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 .84rem/1.3 var(--font-body)}.pb-got small{display:block;margin-top:2px;font:500 .76rem var(--font-body);color:#2d6a3f}
+.pay-box .pb-got button{flex:none;min-height:38px;padding:0 14px;border-radius:8px;font-size:.82rem}
+.pp-sum.bank-t td:first-child{white-space:normal;padding-right:10px}.pp-sum.bank-t td:last-child{word-break:normal}.pay-box .pp-sum{margin:2px 0}.pay-box .bank-t td{padding:4px 0}
 @media (max-height:760px){.pay-box{gap:8px;padding:16px 18px}.pay-box button{min-height:42px}.pay-box .bank-t{font-size:.82rem}.pay-box .demo{font-size:.74rem;padding:8px 10px}}
 @media (min-width:720px) and (max-height:820px){.pay-box{max-width:840px;display:block;column-count:2;column-gap:28px}.pay-box>*{break-inside:avoid;margin:0 0 9px}.pay-box>button{width:100%}}
 @media (max-width:380px){.pay-box .bank-t td:first-child{white-space:normal}}
@@ -1778,7 +1792,7 @@ window.API=(function(){
     if(r.ready){
       h+='<table class="bank-t">'+rows.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>'}).join('')+'</table>';
       h+='<div class="demo">Please put <strong>'+esc(r.reference)+'</strong> as the payment reference so we can match your payment, and send the full amount (bank fees on your side are yours to cover).'+(b.note?' '+esc(b.note):'')+'</div>';
-      h+='<label for="pb-ref">Your bank reference or transaction number (optional)</label><input id="pb-ref" maxlength="80" autocomplete="off"><div class="pb-photo"><label for="pb-photo">Photo of your proof of payment (optional, but it speeds up confirmation)</label><input id="pb-photo" type="file" accept="image/*"><img class="pb-prev" id="pb-prev" alt="Preview of your proof of payment" hidden></div><button class="ok" id="pb-sent">I have sent the transfer</button>';
+      h+='<label for="pb-ref">Your bank reference or transaction number (optional)</label><input id="pb-ref" maxlength="80" autocomplete="off"><div class="pb-photo"><div class="pb-lab">Proof of payment <span>(optional, speeds up confirmation)</span></div><input class="pb-file" id="pb-photo" type="file" accept="image/*"><label class="pb-drop" id="pb-drop" for="pb-photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2a1 1 0 0 0 .8-.4l.9-1.2a1 1 0 0 1 .8-.4h3.6a1 1 0 0 1 .8.4l.9 1.2a1 1 0 0 0 .8.4h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.2"/></svg><span><b id="pb-dt">Add a photo of your payment</b><small id="pb-ds">Take a photo or choose a screenshot from your bank app</small></span></label><div class="pb-got" id="pb-got" hidden><img id="pb-prev" alt="Your proof of payment"><div><b id="pb-name"></b><small id="pb-size"></small></div><button type="button" id="pb-rm">Remove</button></div></div><button class="ok" id="pb-sent">I have sent the transfer</button>';
     }else h+='<div class="demo">Our bank details are not available online yet. Please contact us and we will send them straight away.</div>';
     h+='<button id="pb-cx">Close</button>';
     box.innerHTML=h;ov.classList.add('show');
@@ -1792,16 +1806,24 @@ window.API=(function(){
         c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
         URL.revokeObjectURL(url);c.toBlob(function(b){b?res(b):rej(new Error('encode'))},'image/jpeg',0.82)};
       im.onerror=function(){URL.revokeObjectURL(url);rej(new Error('decode'))};im.src=url})}
-    if(pf)pf.onchange=async function(){shot=null;pv.hidden=true;var f=pf.files&&pf.files[0];if(!f)return;
-      if(f.type&&f.type.indexOf('image/')!==0){toast('Please choose a photo (an image file).');pf.value='';return}
-      try{shot=await shrink(f);if(shot.size>5*1024*1024){shot=null;pf.value='';toast('That photo is too large. Please choose a smaller one.');return}
-        pv.src=URL.createObjectURL(shot);pv.hidden=false}
-      catch(e){shot=null;pf.value='';toast('We could not read that photo. Please try a screenshot or a JPG photo instead.')}};
+    var drop=document.getElementById('pb-drop'),got=document.getElementById('pb-got'),dt=document.getElementById('pb-dt'),ds=document.getElementById('pb-ds'),pvUrl=null;
+    function sentLabel(){sent.textContent=shot?'Send photo and confirm transfer':'I have sent the transfer'}
+    function reset(){shot=null;if(pf)pf.value='';if(pvUrl){URL.revokeObjectURL(pvUrl);pvUrl=null}got.hidden=true;drop.hidden=false;drop.classList.remove('busy');dt.textContent='Add a photo of your payment';ds.textContent='Take a photo or choose a screenshot from your bank app';sentLabel()}
+    if(pf)pf.onchange=async function(){var f=pf.files&&pf.files[0];if(!f){reset();return}
+      if(f.type&&f.type.indexOf('image/')!==0){reset();toast('Please choose a photo (an image file).');return}
+      drop.classList.add('busy');dt.textContent='Preparing your photo…';ds.textContent='This takes a second';
+      try{var b=await shrink(f);if(b.size>5*1024*1024){reset();toast('That photo is too large. Please choose a smaller one.');return}
+        shot=b;if(pvUrl)URL.revokeObjectURL(pvUrl);pvUrl=URL.createObjectURL(b);pv.src=pvUrl;
+        document.getElementById('pb-name').textContent=f.name||'Photo of your payment';
+        document.getElementById('pb-size').textContent='Ready to send · '+(b.size<1048576?Math.max(1,Math.round(b.size/1024))+' KB':(b.size/1048576).toFixed(1)+' MB');
+        drop.hidden=true;got.hidden=false;drop.classList.remove('busy');sentLabel()}
+      catch(e){reset();toast('We could not read that photo. Please try a screenshot or a JPG photo instead.')}};
+    var rm=document.getElementById('pb-rm');if(rm)rm.onclick=reset;
     if(sent)sent.onclick=async function(){sent.disabled=true;
       try{
         if(shot){sent.textContent='Uploading photo…';await API.upload('/api/portal/invoices/'+encodeURIComponent(inv.id)+'/proof',shot)}
         await API.post('/api/portal/invoices/'+encodeURIComponent(inv.id)+'/transfer-sent',{reference:document.getElementById('pb-ref').value.trim()});toast('Thank you. We will confirm your payment as soon as the money reaches our account.');close()}
-      catch(e){sent.disabled=false;sent.textContent='I have sent the transfer';toast(API.text(e))}};
+      catch(e){sent.disabled=false;sentLabel();toast(API.text(e))}};
   }
   async function payInvoice(inv,after){
     try{
