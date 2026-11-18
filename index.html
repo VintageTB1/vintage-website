@@ -1,4 +1,36 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Premium portfolio art direction */
+.va-project{border-radius:8px;overflow:hidden;background:linear-gradient(160deg,#172744,#0b1428);border:1px solid rgba(192,192,192,.16);box-shadow:0 18px 50px rgba(0,0,0,.22);padding:0!important}
+.va-project:hover{box-shadow:0 28px 70px rgba(0,0,0,.38),0 0 0 1px rgba(201,168,106,.32)}
+.va-art{height:clamp(245px,25vw,330px);min-height:245px;border-radius:0;background:#101c36}
+.va-art-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82);transform:scale(1.015);transition:transform 1.1s cubic-bezier(.2,.7,.2,1),filter .8s}
+.va-project:hover .va-art-photo{transform:scale(1.09);filter:saturate(1.08)}
+.va-art:after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,10,20,.05) 0%,rgba(5,10,20,.08) 38%,rgba(5,10,20,.78) 100%)}
+.va-art-window{z-index:2;left:8%;right:8%;top:12%;bottom:16%;border:1px solid rgba(255,255,255,.46);background:rgba(12,20,34,.24);backdrop-filter:blur(3px);border-radius:5px;box-shadow:0 24px 65px #0008;overflow:hidden}
+.va-art-window:after{content:"";position:absolute;inset:15px 0 0;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.11) 48%,transparent 72%);transform:translateX(-130%);animation:vaScreenSheen 7s ease-in-out infinite}
+.va-art-top{height:19px;background:rgba(5,10,20,.58);padding:0 10px}.va-art-top i{width:5px;height:5px}
+.va-art-lines{left:8%;top:30%;width:52%;gap:10px;z-index:2}.va-art-lines b{height:7px;border-radius:2px;background:#fff}.va-art-lines b:nth-child(2){height:4px;width:80%;background:rgba(255,255,255,.68)}.va-art-lines b:nth-child(3){height:3px;width:48%;background:var(--gold)}
+.va-art-shape{z-index:2;right:8%;bottom:12%;width:31%;height:57%;border-radius:48% 48% 4px 4px;box-shadow:0 15px 35px #0006}
+.va-art-badge{position:absolute;z-index:4;left:15px;top:15px;padding:7px 10px;border:1px solid #ffffff65;border-radius:2px;background:#0b1429a8;color:#fff;font-size:8px;letter-spacing:.2em;text-transform:uppercase;backdrop-filter:blur(10px)}
+.va-art-caption{position:absolute;z-index:4;left:18px;bottom:16px;color:#fff;font:500 clamp(18px,2.1vw,27px)/1 Georgia,serif;text-shadow:0 2px 14px #0009}.va-art-index{z-index:4}
+.va-project>.tag{display:inline-flex;margin:18px 20px 0;color:var(--gold);letter-spacing:.16em}.va-project>div:last-of-type{padding:4px 20px 21px}.va-project>div:last-of-type h3{margin-top:5px}.va-card-link{margin-top:14px}
+@keyframes vaScreenSheen{0%,48%{transform:translateX(-130%)}75%,100%{transform:translateX(130%)}}
+.va-demo-shell{border:1px solid rgba(255,255,255,.18);box-shadow:0 40px 120px #000b}
+.va-demo-hero{isolation:isolate;background-image:linear-gradient(90deg,rgba(8,12,20,.78),rgba(8,12,20,.28)),var(--demo-hero-image);background-size:cover;background-position:center;color:#fff}
+.va-demo-hero .va-demo-kicker,.va-demo-hero p{color:#fff}
+.va-demo-hero:before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(130deg,transparent 25%,rgba(255,255,255,.2) 50%,transparent 68%);background-size:220% 100%;animation:vaHeroLight 12s ease-in-out infinite}
+.va-demo-hero h2{animation:vaTitleIn .9s cubic-bezier(.2,.8,.2,1) both}
+.va-demo-visual{border-radius:4px;box-shadow:0 24px 60px rgba(0,0,0,.14);transform:translateZ(0)}
+.va-demo-visual:before{content:"";position:absolute;inset:12%;border:1px solid #ffffff70;border-radius:2px;transform:rotate(-5deg);animation:vaFrameDrift 8s ease-in-out infinite alternate}
+.va-demo-tile{border:1px solid rgba(20,25,35,.08);box-shadow:0 12px 30px rgba(20,25,35,.04)}.va-demo-tile:hover{box-shadow:0 20px 40px rgba(20,25,35,.12)}
+@keyframes vaHeroLight{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+@keyframes vaTitleIn{from{opacity:0;transform:translateY(22px);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes vaFrameDrift{to{transform:rotate(4deg) translateY(-8px)}}
+@media(max-width:650px){.va-art{height:250px}.va-project>div:last-of-type{padding-inline:16px}}
+@media(prefers-reduced-motion:reduce){.va-art-photo,.va-art-window:after,.va-demo-hero:before,.va-demo-visual:before{animation:none!important;transition:none!important}}
+
+</style><style>.pp-card .bank-t td{color:#e8ecf4}.pp-card .bank-t td small{color:#9aa6bd}</style>
+</head><body>
 <title>Vintage Advertising</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Vintage Advertising builds websites, runs marketing campaigns and creates custom AI chatbots. Strategy. Creativity. Impact.">
@@ -387,10 +419,7 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .pay-box button{min-height:46px;border-radius:6px;border:1px solid #c9ced8;background:#fff;color:#1b2333;font:500 .9rem var(--font-body);cursor:pointer}
 .pay-box input{min-height:42px;border:1px solid #c9ced8;border-radius:6px;padding:0 10px;font:400 .9rem var(--font-body);color:#1b2333 !important;background:#fff !important;width:100%;box-sizing:border-box}
 .pay-box label{font:500 .72rem var(--font-body);color:#6b7385}
-.pp-sum{margin:10px 0}.pp-sum tr.hl td{color:inherit;font-weight:700}.pp-sum td:first-child{white-space:normal;width:auto}.pp-sum td:last-child{white-space:nowrap;text-align:right;width:1%;padding-left:14px}.pp-card .pp-sum td:last-child{white-space:normal;text-align:left;width:auto;padding-left:8px}.pp-card{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;margin:0 0 12px}.pp-card h4{margin:0 0 6px}.pp-card .pp-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0}.pp-card .pp-bar i{display:block;height:100%;background:#c9a24b}.pf-view{max-width:min(92vw,560px);max-height:80vh;overflow:auto}.pf-view img{display:block;width:100%;height:auto;margin:10px 0;border-radius:8px}
-.bank-t{border-collapse:collapse;width:100%;font-size:.86rem}.bank-t td{padding:5px 0;vertical-align:top}.bank-t td:first-child{color:#6b7385;padding-right:14px;white-space:nowrap}.bank-t td:last-child{font-weight:600;user-select:all;word-break:break-all}
-.pay-box button.ok{background:#1b2333;color:#fff;border-color:#1b2333}
-.pb-photo{display:grid;gap:7px;margin:2px 0}
+.pp-sum{margin:10px 0}.pp-sum tr.hl td{color:inherit;font-weight:700}.pp-sum td:first-child{white-space:normal;width:auto}.pp-sum td:last-child{white-space:nowrap;text-align:right;width:1%;padding-left:14px}.pp-card .pp-sum td:last-child{white-space:normal;text-align:left;width:auto;padding-left:8px}.pp-card{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 14px;margin:0 0 12px}.pp-card h4{margin:0 0 6px}.pp-card .pp-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0}.pp-card .pp-bar i{display:block;height:100%;background:#c9a24b}.pb-photo{display:grid;gap:7px;margin:2px 0}
 .pb-lab{font:600 .82rem/1.3 var(--font-body);color:#1b2333}.pb-lab span{font-weight:400;color:#6b7385}
 .pb-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
 .pb-drop{display:flex;align-items:center;gap:14px;box-sizing:border-box;min-height:64px;padding:12px 16px;border:1.5px dashed #aab2c3;border-radius:12px;background:#f7f8fb;color:#1b2333;cursor:pointer;transition:background .15s,border-color .15s;-webkit-tap-highlight-color:transparent}
@@ -404,7 +433,10 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .pb-got img{flex:none;width:58px;height:58px;object-fit:cover;border-radius:8px;border:1px solid #d5e5da;background:#fff}
 .pb-got>div{flex:1;min-width:0}.pb-got b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 .84rem/1.3 var(--font-body)}.pb-got small{display:block;margin-top:2px;font:500 .76rem var(--font-body);color:#2d6a3f}
 .pay-box .pb-got button{flex:none;min-height:38px;padding:0 14px;border-radius:8px;font-size:.82rem}
-.pp-sum.bank-t td:first-child{white-space:normal;padding-right:10px}.pp-sum.bank-t td:last-child{word-break:normal}.pay-box .pp-sum{margin:2px 0}.pay-box .bank-t td{padding:4px 0}
+.pp-sum.bank-t td:first-child{white-space:normal;padding-right:10px}.pp-sum.bank-t td:last-child{word-break:normal}.pay-box .pp-sum{margin:2px 0}.pay-box .bank-t td{padding:4px 0}.pf-view{max-width:min(92vw,560px);max-height:80vh;overflow:auto}.pf-view img{display:block;width:100%;height:auto;margin:10px 0;border-radius:8px}
+.bank-t{border-collapse:collapse;width:100%;font-size:.86rem}.bank-t td{padding:5px 0;vertical-align:top}.bank-t td:first-child{color:#6b7385;padding-right:14px;white-space:nowrap}.bank-t td:last-child{font-weight:600;user-select:all;word-break:break-all}
+.pay-box button.ok{background:#1b2333;color:#fff;border-color:#1b2333}
+.pp-sum.bank-t td:first-child{white-space:normal;padding-right:10px}.pp-sum.bank-t td:last-child{word-break:normal}.pay-box .pp-sum{margin:2px 0}.pay-box .bank-t td{padding:4px 0}.pay-box .pb-photo input[type=file]{box-sizing:border-box;min-height:0;padding:8px 10px}
 @media (max-height:760px){.pay-box{gap:8px;padding:16px 18px}.pay-box button{min-height:42px}.pay-box .bank-t{font-size:.82rem}.pay-box .demo{font-size:.74rem;padding:8px 10px}}
 @media (min-width:720px) and (max-height:820px){.pay-box{max-width:840px;display:block;column-count:2;column-gap:28px}.pay-box>*{break-inside:avoid;margin:0 0 9px}.pay-box>button{width:100%}}
 @media (max-width:380px){.pay-box .bank-t td:first-child{white-space:normal}}
@@ -432,6 +464,28 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 .bk-row input[type=text],.bk-row textarea{flex:1;min-width:200px;background:rgba(10,18,38,.6);border:1px solid var(--silver-dim);border-radius:3px;color:var(--white);font:300 .95rem var(--font-body);padding:12px 14px;min-height:46px}
 .bk-sug{background:rgba(201,168,106,.06)}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Vintage interactive concept portfolio */
+.va-project{cursor:pointer;text-align:left;color:inherit;font:inherit;width:100%;border:0;background:transparent;position:relative;transition:transform .55s cubic-bezier(.2,.7,.2,1),filter .4s}
+.va-project:hover{transform:translateY(-9px)}
+.va-art{height:100%;min-height:230px;position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 75% 20%,hsla(var(--concept-hue),75%,65%,.34),transparent 42%),linear-gradient(145deg,#182744,#080f1f)}
+.va-art:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.08) 48%,transparent 68%);transform:translateX(-120%);transition:transform 1s}
+.va-project:hover .va-art:before{transform:translateX(120%)}
+.va-art-orb{position:absolute;width:180px;height:180px;border-radius:50%;right:-30px;top:12px;background:radial-gradient(circle at 35% 30%,hsla(var(--concept-hue),80%,82%,.7),hsla(var(--concept-hue),65%,48%,.08) 65%,transparent 70%);filter:blur(1px);animation:vaFloat 7s ease-in-out infinite alternate}
+.va-art-window{position:absolute;left:12%;right:12%;top:16%;bottom:12%;border:1px solid rgba(255,255,255,.32);background:rgba(8,15,31,.55);backdrop-filter:blur(8px);box-shadow:0 18px 50px #0008;transform:perspective(700px) rotateY(-8deg) rotateX(3deg);transition:transform .7s}
+.va-project:hover .va-art-window{transform:perspective(700px) rotateY(0) rotateX(0) translateY(-4px)}
+.va-art-top{height:15px;border-bottom:1px solid #ffffff20;display:flex;gap:4px;align-items:center;padding:0 8px}.va-art-top i{width:4px;height:4px;border-radius:50%;background:#ffffff70}
+.va-art-lines{position:absolute;left:12%;top:32%;width:45%;display:grid;gap:8px}.va-art-lines b{height:5px;border-radius:10px;background:#f4f6f8c9}.va-art-lines b:nth-child(2){width:72%;height:3px;background:#c0c0c080}.va-art-lines b:nth-child(3){width:48%;height:3px;background:#c9a86a}
+.va-art-shape{position:absolute;right:10%;bottom:13%;width:34%;height:52%;border-radius:48% 48% 8px 8px;background:linear-gradient(145deg,hsla(var(--concept-hue),65%,75%,.75),hsla(var(--concept-hue),45%,30%,.15));box-shadow:0 0 45px hsla(var(--concept-hue),75%,60%,.2)}
+.va-art-1 .va-art-shape{border-radius:8px;transform:rotate(-8deg)}.va-art-2 .va-art-shape{border-radius:50% 50% 12px 12px}.va-art-3 .va-art-shape{clip-path:polygon(50% 0,100% 100%,0 100%);border-radius:0}.va-art-4 .va-art-shape{border-radius:50%;width:42%;height:42%}.va-art-5 .va-art-shape{border-radius:45% 8% 45% 8%;transform:rotate(15deg)}
+.va-art-index{position:absolute;right:12px;bottom:10px;color:#ffffff85;font:10px monospace;letter-spacing:.2em}
+.va-card-link{display:inline-flex;gap:9px;align-items:center;margin-top:12px;color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase}.va-card-link b{font-size:1rem;transition:transform .3s}.va-project:hover .va-card-link b{transform:translate(3px,-3px)}
+@keyframes vaFloat{to{transform:translate3d(-12px,18px,0) scale(1.08)}}
+.va-demo{position:fixed;z-index:100000;inset:0;background:#050914f2;backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px)}.va-demo.is-open{display:flex;animation:vaFade .35s ease both}.va-demo-shell{width:min(1180px,100%);height:min(92vh,900px);background:#f7f5ef;color:#171b25;overflow:auto;position:relative;border-radius:10px;box-shadow:0 30px 100px #0009;animation:vaRise .5s cubic-bezier(.2,.8,.2,1) both}.va-demo-close{position:sticky;top:12px;float:right;z-index:10;margin:12px 12px -52px 0;width:40px;height:40px;border-radius:50%;border:1px solid #ffffff60;background:#101c36;color:white;font-size:22px;cursor:pointer}.va-demo-site{min-height:100%;font-family:Arial,sans-serif}.va-demo-nav{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,5vw,62px);font-size:11px;letter-spacing:.15em;text-transform:uppercase}.va-demo-brand{font-family:Georgia,serif;font-size:23px;letter-spacing:.02em}.va-demo-navlinks{display:flex;gap:24px;align-items:center}.va-demo-navlinks a{color:inherit;text-decoration:none}.va-demo-cta{padding:12px 17px;background:var(--demo-accent);color:white;border:0;text-decoration:none;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.va-demo-hero{padding:clamp(54px,9vw,115px) clamp(22px,8vw,100px);min-height:430px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}.va-demo-kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.7}.va-demo-hero h2{font-family:Georgia,serif;font-weight:400;font-size:clamp(48px,8vw,104px);line-height:.95;letter-spacing:-.055em;max-width:850px;margin:25px 0}.va-demo-hero p{font-size:14px;line-height:1.8;max-width:460px;opacity:.78}.va-demo-section{padding:70px clamp(22px,8vw,100px)}.va-demo-section h3{font:400 clamp(32px,5vw,54px)/1.05 Georgia,serif;letter-spacing:-.04em;margin:12px 0 22px}.va-demo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:30px}.va-demo-tile{min-height:160px;padding:24px;background:var(--demo-tile);display:flex;flex-direction:column;justify-content:space-between;transition:transform .35s}.va-demo-tile:hover{transform:translateY(-6px)}.va-demo-tile strong{font:24px Georgia,serif}.va-demo-tile span{font-size:11px;opacity:.7;line-height:1.6}.va-demo-feature{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}.va-demo-visual{min-height:260px;background:linear-gradient(140deg,var(--demo-accent),var(--demo-deep));position:relative;overflow:hidden}.va-demo-visual:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff70;border-radius:50%;right:-20px;top:20px;box-shadow:0 0 0 25px #ffffff0c,0 0 0 55px #ffffff0a;animation:vaFloat 8s ease-in-out infinite alternate}.va-demo-footer{padding:30px clamp(22px,8vw,100px);background:#111c32;color:#fff;display:flex;justify-content:space-between;gap:20px;font-size:10px;letter-spacing:.12em;text-transform:uppercase}.va-demo-enter{animation:vaEnter .8s cubic-bezier(.2,.7,.2,1) both}.va-demo-enter:nth-child(2){animation-delay:.12s}.va-demo-enter:nth-child(3){animation-delay:.22s}
+@keyframes vaFade{from{opacity:0}to{opacity:1}}@keyframes vaRise{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:none}}@keyframes vaEnter{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@media(max-width:650px){.va-demo{padding:0}.va-demo-shell{height:100dvh;border-radius:0}.va-demo-navlinks a:not(.va-demo-cta){display:none}.va-demo-grid{grid-template-columns:1fr 1fr}.va-demo-feature{grid-template-columns:1fr}.va-demo-footer{flex-direction:column}.va-demo-hero{min-height:400px}}
+@media(prefers-reduced-motion:reduce){.va-art-orb,.va-demo-visual:after{animation:none!important}.va-project,.va-demo-shell,.va-demo-enter{transition:none!important;animation:none!important}}
 </style>
 
 <div id="loader" aria-hidden="true">
@@ -514,8 +568,8 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 <section id="work">
   <div class="wrap">
     <div class="eyebrow rv">Selected work</div>
-    <h2 class="rv">Portfolio examples in progress.</h2>
-    <p class="lead rv">These six are placeholders and labelled as examples. Real client work replaces them as it is approved.</p>
+    <h2 class="rv">Six ideas. Six distinct digital worlds.</h2>
+    <p class="lead rv">Explore these interactive concept websites. Each is a fictional portfolio demonstration created to show what Vintage can build.</p>
     <div class="work" id="work-grid"></div>
   </div>
 </section>
@@ -553,12 +607,12 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 <section id="voices">
   <div class="wrap">
     <div class="eyebrow rv">Kind words</div>
-    <h2 class="rv">What clients say.</h2>
+    <h2 class="rv">The experience, imagined.</h2><p class="lead rv">The following are fictional sample testimonials for layout demonstration, not statements from actual clients.</p>
     <div class="tst" aria-roledescription="carousel" aria-label="Testimonials">
       <div class="tst-track" id="tst-track">
-        <figure class="tst-item" style="margin:0"><blockquote>“Placeholder: they turned a vague idea into a site we were proud to send to customers.”</blockquote><figcaption class="who">Client name<small>Placeholder testimonial · Business, Harare</small></figcaption></figure>
-        <figure class="tst-item" style="margin:0"><blockquote>“Placeholder: the monthly report finally made our marketing spend make sense.”</blockquote><figcaption class="who">Client name<small>Placeholder testimonial · Business, Bulawayo</small></figcaption></figure>
-        <figure class="tst-item" style="margin:0"><blockquote>“Placeholder: our chatbot books appointments at midnight and we wake up to a full diary.”</blockquote><figcaption class="who">Client name<small>Placeholder testimonial · Business, Mutare</small></figcaption></figure>
+        <figure class="tst-item" style="margin:0"><blockquote>“The finished experience feels considered from the first click. It gives our brand a much stronger digital presence.”</blockquote><figcaption class="who">Amara Bennett<small>Illustrative sample · Boutique brand, London</small></figcaption></figure>
+        <figure class="tst-item" style="margin:0"><blockquote>“The campaign concept brought our message into focus and made every part of the customer journey feel connected.”</blockquote><figcaption class="who">Daniel Mwangi<small>Illustrative sample · Fitness studio, Nairobi</small></figcaption></figure>
+        <figure class="tst-item" style="margin:0"><blockquote>“The booking assistant makes the experience feel effortless. Customers can get answers even after we close.”</blockquote><figcaption class="who">Sofia Williams<small>Illustrative sample · Hospitality brand, Cape Town</small></figcaption></figure>
       </div>
       <div class="tst-ctl" id="tst-ctl"></div>
     </div>
@@ -649,6 +703,36 @@ footer{margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:70
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<div class="va-demo" id="va-demo" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Portfolio concept preview"><div class="va-demo-shell"><button class="va-demo-close" type="button" aria-label="Close preview">×</button><div class="va-demo-site" id="va-demo-site"></div></div></div>
+<script>
+(function(){
+ var modal=document.getElementById('va-demo'),site=document.getElementById('va-demo-site'),close=modal.querySelector('.va-demo-close'),lastFocus=null;
+ var concepts=[
+ {brand:'HARBOUR & HEARTH',nav:['Our story','Menu','Find us'],kicker:'A place to slow down',title:'Good food.<br><em>Long evenings.</em>',desc:'A warm, editorial restaurant experience built around seasonal plates, thoughtful details and the pleasure of gathering.',cta:'Reserve a table',accent:'#b56a45',deep:'#472d2b',bg:'#f2e9dd',tile:'#e8d8c6',ink:'#30231e',tiles:[['Seasonal kitchen','A menu that follows the market.'],['Made to gather','Thoughtful spaces for shared moments.'],['A little ritual','From first coffee to last pour.']] ,feature:'A menu with a sense of place',copy:'Explore a changing selection of thoughtful dishes, local ingredients and small moments worth remembering.'},
+ {brand:'NORTHFIELD',nav:['Training','Coaches','Membership'],kicker:'Move with intention',title:'Stronger every<br><em>single day.</em>',desc:'A bold fitness studio concept with clear class discovery, coach profiles and a focused membership journey.',cta:'Explore classes',accent:'#d3ff55',deep:'#243d32',bg:'#101a18',tile:'#1e2d28',ink:'#f2f4eb',tiles:[['Strength','Build a foundation that lasts.'],['Conditioning','Find your pace and push further.'],['Community','Progress is better together.']],feature:'Training built around you',copy:'Small-group coaching, considered programming and a welcoming space for every stage of the journey.'},
+ {brand:'DENTAL DIAL',nav:['Treatments','The team','Appointments'],kicker:'Care that feels different',title:'A brighter smile<br><em>starts here.</em>',desc:'A calm, modern dental practice website with approachable service information and frictionless appointment booking.',cta:'Book a visit',accent:'#67b7bd',deep:'#183b49',bg:'#edf7f5',tile:'#d9eeeb',ink:'#18333a',tiles:[['General care','Thoughtful care for every smile.'],['Cosmetic','Subtle confidence, beautifully done.'],['Family dentistry','Comfortable visits for all ages.']],feature:'Your comfort comes first',copy:'Clear guidance, a friendly team and a considered experience from the first enquiry to your visit.'},
+ {brand:'KRAFT STUDIO',nav:['Selected work','Studio','Contact'],kicker:'Independent creative studio',title:'Ideas with<br><em>an edge.</em>',desc:'A refined portfolio concept for a design studio, using expressive typography, generous space and a tactile visual language.',cta:'View selected work',accent:'#b6a2df',deep:'#40335c',bg:'#f0edf7',tile:'#e1daf0',ink:'#272039',tiles:[['Identity','Distinctive systems with meaning.'],['Digital','Digital experiences with character.'],['Direction','A clear point of view, made visible.']],feature:'A studio for the curious',copy:'We connect strategy and visual craft to create identities and digital experiences people remember.'},
+ {brand:'GREEN LEAF',nav:['Our produce','Our promise','Visit'],kicker:'Good things grow here',title:'Fresh choices.<br><em>Better days.</em>',desc:'A bright grocery brand concept that brings seasonal produce, local sourcing and everyday inspiration to the foreground.',cta:'Explore the market',accent:'#8dbb69',deep:'#294b35',bg:'#f2f4e9',tile:'#e0e9d2',ink:'#263b2b',tiles:[['In season','Fresh picks at their best.'],['Local first','Supporting growers close to home.'],['Less waste','Small choices with a lighter footprint.']],feature:'A fresher way to shop',copy:'Discover produce, pantry favourites and simple inspiration for meals that make the most of every season.'},
+ {brand:'STAY EASY',nav:['Stays','Experiences','Book'],kicker:'Your next escape',title:'Arrive.<br><em>Unwind.</em>',desc:'A boutique hospitality concept designed to make discovering a stay, exploring experiences and booking feel effortless.',cta:'Find your stay',accent:'#d2ad72',deep:'#4b3a2b',bg:'#f3eee5',tile:'#e6dac8',ink:'#30281f',tiles:[['Thoughtful stays','Spaces designed for switching off.'],['Local moments','Experiences beyond the room.'],['Easy arrival','A smoother journey from start to stay.']],feature:'Make room for somewhere new',copy:'Find a slower rhythm, considered comfort and the little details that make a trip feel special.'}
+ ];
+ function openConcept(i){var c=concepts[i];if(!c)return;lastFocus=document.activeElement;
+ var heroPhotos=[
+ 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1800&q=88',
+ 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=88',
+ 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1800&q=88',
+ 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1800&q=88',
+ 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1800&q=88',
+ 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=88'
+ ];
+ site.style.setProperty('--demo-hero-image','url(\"'+heroPhotos[i]+'\")');
+ site.style.setProperty('--demo-accent',c.accent);site.style.setProperty('--demo-deep',c.deep);site.style.setProperty('--demo-tile',c.tile);site.style.color=c.ink;site.style.background=c.bg;
+ site.innerHTML='<nav class="va-demo-nav"><div class="va-demo-brand">'+c.brand+'</div><div class="va-demo-navlinks">'+c.nav.map(function(n){return '<a href="#va-demo-details">'+n+'</a>'}).join('')+'<a class="va-demo-cta" href="#va-demo-details">'+c.cta+'</a></div></nav><header class="va-demo-hero"><span class="va-demo-kicker va-demo-enter">'+c.kicker+'</span><h2 class="va-demo-enter">'+c.title+'</h2><p class="va-demo-enter">'+c.desc+'</p><div class="va-demo-enter" style="margin-top:25px"><a class="va-demo-cta" href="#va-demo-details">'+c.cta+' ↗</a></div></header><section class="va-demo-section" id="va-demo-details"><span class="va-demo-kicker">THE DETAILS</span><h3 class="va-demo-enter">Designed around<br>what matters.</h3><div class="va-demo-grid">'+c.tiles.map(function(t){return '<article class="va-demo-tile va-demo-enter"><strong>'+t[0]+'</strong><span>'+t[1]+'</span></article>'}).join('')+'</div></section><section class="va-demo-section" style="background:'+c.tile+'"><div class="va-demo-feature"><div><span class="va-demo-kicker">A CLOSER LOOK</span><h3>'+c.feature+'</h3><p style="font-size:13px;line-height:1.8;max-width:420px">'+c.copy+'</p><a class="va-demo-cta" href="#va-demo-top" style="display:inline-block;margin-top:15px">'+c.cta+' ↗</a></div><div class="va-demo-visual"></div></div></section><footer class="va-demo-footer"><span>'+c.brand+'</span><span>Concept website by Vintage Advertising</span><span>Strategy. Creativity. Impact.</span></footer>';
+ modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';close.focus();
+ }
+ function closeConcept(){modal.classList.remove('is-open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+ close.addEventListener('click',closeConcept);modal.addEventListener('click',function(e){if(e.target===modal)closeConcept()});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('is-open'))closeConcept()});window.openConcept=openConcept;
+})();
+</script>
 <script>
 /* ===== EDITABLE CONFIG (in the full build these become pricing.ts and knowledge.ts) ===== */
 var CONFIG={
@@ -700,21 +784,30 @@ var burger=$('#burger'),menu=$('#menu');
 burger.addEventListener('click',function(){var o=menu.classList.toggle('open');burger.setAttribute('aria-expanded',o);burger.setAttribute('aria-label',o?'Close menu':'Open menu')});
 $$('#menu a').forEach(function(a){a.addEventListener('click',function(){menu.classList.remove('open');burger.setAttribute('aria-expanded','false')})});
 
-/* work cards (generated art) */
-(function(){
-  var g=$('#work-grid');
-  CONFIG.work.forEach(function(w,i){
-    var a=document.createElement('a');a.className='proj tilt';a.href='#contact';a.setAttribute('aria-label',w[1]+', '+w[2]+' (portfolio example)');
-    var hue=[210,38,215,200,42,220][i];
-    var art=document.createElement('div');art.className='art';
-    art.style.background='radial-gradient(circle at '+(20+i*13)+'% '+(30+(i%3)*20)+'%,hsla('+hue+',35%,'+(i%2?62:42)+'%,.55),transparent 55%),linear-gradient(150deg,#16264A,#0A1226)';
-    art.innerHTML='<svg viewBox="0 0 200 250" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" fill="none" stroke="rgba(192,192,192,.28)" stroke-width=".6" aria-hidden="true">'+[0,1,2,3,4,5,6].map(function(k){return '<circle cx="'+(60+i*14)+'" cy="'+(100+(i%2)*30)+'" r="'+(18+k*14)+'"/>'}).join('')+'</svg>';
-    a.appendChild(art);
-    a.insertAdjacentHTML('beforeend','<span class="tag">Portfolio example</span><div><small>'+w[0]+'</small><h3>'+w[1]+'</h3></div>');
-    g.appendChild(a);
-  });
-})();
-
+  /* Interactive portfolio concept cards */ (function(){
+   var g=$('#work-grid');
+   CONFIG.work.forEach(function(w,i){
+     var a=document.createElement('button');a.type='button';a.className='proj tilt va-project';a.setAttribute('aria-label','Preview '+w[1]+', fictional portfolio concept');a.dataset.project=String(i);
+     var hue=[210,38,215,155,42,265][i];
+     var photos=[
+       'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=85',
+       'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85',
+       'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1200&q=85',
+       'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200&q=85',
+       'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=85',
+       'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=85'
+     ];
+     var labels=['A considered dining experience','Train with purpose','Care, beautifully delivered','A sharper creative point of view','Fresh from the source','A stay worth remembering'];
+     var art=document.createElement('div');art.className='art va-art va-art-'+i;
+     var photo=document.createElement('img');photo.className='va-art-photo';photo.src=photos[i];photo.alt='Visual preview for '+w[1];photo.loading='lazy';photo.decoding='async';photo.onerror=function(){this.style.display='none'};art.appendChild(photo);
+     art.insertAdjacentHTML('beforeend','<span class="va-art-badge">Digital experience · 0'+(i+1)+'</span><div class="va-art-window"><div class="va-art-top"><i></i><i></i><i></i></div><div class="va-art-lines"><b></b><b></b><b></b></div><div class="va-art-shape"></div></div><span class="va-art-caption">'+labels[i]+'</span><span class="va-art-index">0'+(i+1)+'</span>');
+     art.style.setProperty('--concept-hue',hue);
+     a.appendChild(art);
+     a.insertAdjacentHTML('beforeend','<span class="tag">Interactive concept</span><div><small>'+w[0]+'</small><h3>'+w[1]+'</h3><span class="va-card-link">Explore concept <b>↗</b></span></div>');
+     a.addEventListener('click',function(){openConcept(i)});
+     g.appendChild(a);
+   });
+ })();
 /* pricing */
 var state={tab:'websites',monthly:false};
 var tabs=$('#tabs'),plansEl=$('#plans'),tgl=$('#toggle'),sw=$('#sw');
@@ -1289,6 +1382,7 @@ window.API=(function(){
 </script>
 
 <section class="bp" id="portalview" role="dialog" aria-label="Client portal"><div class="bp-in"><button class="btn small" type="button" data-bpx style="position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,env(safe-area-inset-right,0px));z-index:2">Close</button><div id="bp-body"></div></div></section>
+<section class="bp" id="ordersadmin" role="dialog" aria-label="Custom orders admin"><div class="bp-in"><button class="btn small" type="button" id="co-x" style="position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,env(safe-area-inset-right,0px));z-index:2">Close</button><div id="co-body"></div></div></section>
 <section class="bp" id="billadmin" role="dialog" aria-label="Billing admin"><div class="bp-in"><button class="btn small" type="button" data-bpx style="position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,env(safe-area-inset-right,0px));z-index:2">Close</button><div id="ba-body"></div></div></section>
 <div class="pay-ov" id="pay-ov" role="dialog" aria-modal="true" aria-label="Demo checkout"><div class="pay-box" id="pay-box"></div></div>
 
@@ -1696,7 +1790,8 @@ window.API=(function(){
   var V={portal:{el:document.getElementById('portalview'),body:document.getElementById('bp-body')},
     bill:{el:document.getElementById('billadmin'),body:document.getElementById('ba-body')},
     leads:{el:document.getElementById('adminleads'),body:document.getElementById('al-body')},
-    books:{el:document.getElementById('booksview'),body:document.getElementById('bk-body')}};
+    books:{el:document.getElementById('booksview'),body:document.getElementById('bk-body')},
+    orders:{el:document.getElementById('ordersadmin'),body:document.getElementById('co-body')}};
   var cur=null,pending=null,gen=0;
   var LEGAL_HASH=/^#(terms|privacy|refunds)$/;
   function show(k){cur=k;gen++;Object.keys(V).forEach(function(j){V[j].el.classList.toggle('show',j===k)});document.body.style.overflow='hidden';return V[k].body}
@@ -1876,6 +1971,7 @@ window.API=(function(){
           '<tr class="hl"><td>Paid so far</td><td>'+usd(p.paid)+'</td></tr>'+
           '<tr class="hl"><td>Still to pay</td><td>'+usd(p.remaining)+'</td></tr></table></div>'}).join('');
     }
+    h+='<h3 class="sec">Custom orders</h3><div id="co-box"><p class="lead">Loading…</p></div>';
     h+='<h3 class="sec">Invoices</h3><div class="al-table"><table><thead><tr><th>Invoice</th><th>Description</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>';
     if(!invs.length)h+='<tr><td colspan="6">No invoices yet.</td></tr>';
     invs.forEach(function(i){h+='<tr><td><strong>'+esc(i.id)+'</strong></td><td>'+esc(i.desc)+'</td><td>'+usd(i.amount)+'</td><td>'+fmt(i.due)+'</td><td><span class="st '+istat(i)+'">'+istat(i)+'</span>'+(i.status==='unpaid'&&i.transferReportedAt?'<br><small>Transfer reported, waiting for the money to arrive</small>':'')+'</td><td><div class="bp-act">'+(i.status==='unpaid'?'<button class="btn gold mini" data-pay="'+esc(i.id)+'" type="button">Pay by bank transfer</button><button class="btn mini" data-link="'+esc(i.id)+'" type="button">Copy link</button>':'')+'<button class="btn mini" data-dl="'+esc(i.id)+'" type="button">'+(i.status==='paid'?'Receipt':'Invoice')+'</button></div></td></tr>'});
@@ -1883,7 +1979,7 @@ window.API=(function(){
     if(!d.payments.length)h+='<tr><td colspan="5">No payments yet.</td></tr>';
     d.payments.forEach(function(p){h+='<tr><td>'+fmt(p.at)+'</td><td>'+esc(p.invoice)+'</td><td>'+usd(p.amount)+'</td><td>'+esc(p.method)+'</td><td><span class="st '+esc(p.status)+'">'+esc(p.status)+'</span></td></tr>'});
     h+='</tbody></table></div><h3 class="sec">Change password</h3><form class="bp-form" id="cp-f"><div><label for="cp-a">Current password</label><input id="cp-a" type="password" autocomplete="current-password" required></div><div><label for="cp-b">New password (10+ characters)</label><input id="cp-b" type="password" autocomplete="new-password" required minlength="10"></div><div><button class="btn small" type="submit">Change password</button></div></form><div class="al-banner" id="cp-err" hidden style="margin-top:12px"></div>';
-    body.innerHTML=h;bindSignOut(body,function(){openPortal()});
+    body.innerHTML=h;bindSignOut(body,function(){openPortal()});fillCustom(body);
     var again=function(){openPortal()};
     var rv=body.querySelector('#rv');if(rv)rv.onclick=async function(){try{await API.post('/api/auth/resend-verification');toast('Confirmation link sent.')}catch(e){toast(API.text(e))}};
     body.querySelectorAll('[data-pay]').forEach(function(b){b.onclick=function(){var i=invs.filter(function(x){return x.id===b.dataset.pay})[0];payInvoice(i,again)}});
@@ -1956,7 +2052,7 @@ window.API=(function(){
     var R;try{R=await Promise.all([API.get('/api/admin/summary'),API.get('/api/admin/invoices'),API.get('/api/admin/subscriptions'),API.get('/api/admin/clients'),API.get('/api/admin/webhook-events'),API.get('/api/admin/outbox')])}
     catch(e){if(stale(g))return;if(e.status===401){openBilling();return}body.innerHTML=note(esc(API.text(e)));return}
     if(stale(g))return;
-    var S=R[0],invs=R[1].invoices,subs=R[2].subscriptions,clients=R[3].clients,evs=R[4].events,mail=R[5].mail;
+    var S=R[0],invs=R[1].invoices,subs=R[2].subscriptions,clients=R[3].clients,evs=R[4].events||[],mail=R[5].mail;
     var h='<div class="eyebrow">Admin</div><h2>Billing</h2><p class="lead">Payments: <strong>bank transfer</strong>. When the money reaches your account, press Mark paid on that invoice. '+signOutBtn()+'</p>';
     h+='<div class="bp-cards"><div class="bp-card"><small>Collected</small><b>'+cents(S.collectedCents)+'</b></div><div class="bp-card"><small>Outstanding</small><b>'+cents(S.outstandingCents)+'</b></div><div class="bp-card"><small>Refunded</small><b>'+cents(S.refundedCents)+'</b></div><div class="bp-card"><small>Monthly recurring</small><b>'+cents(S.monthlyRecurringCents)+'</b></div><div class="bp-card"><small>Active services</small><b>'+S.activeServices+'</b></div><div class="bp-card"><small>New leads</small><b>'+S.newLeads+'</b></div></div>';
     h+='<h3 class="sec">Create invoice</h3>'+(clients.length?'<form class="bp-form" id="ba-form"><div><label for="ba-c">Client</label><select id="ba-c">'+clients.map(function(c){return '<option value="'+esc(c.id)+'">'+esc(c.name)+' ('+esc(c.email)+')</option>'}).join('')+'</select></div><div><label for="ba-d">Description</label><input id="ba-d" required maxlength="80" placeholder="e.g. Logo refresh"></div><div><label for="ba-a">Amount (USD)</label><input id="ba-a" type="number" min="0.01" step="0.01" required></div><div><label for="ba-due">Due in days</label><input id="ba-due" type="number" min="0" max="365" value="7"></div><div><button class="btn gold small" type="submit">Create and email</button></div></form>':'<p class="lead">No client accounts yet. Clients appear here after they sign up, or invite one below.</p>');
@@ -1969,6 +2065,7 @@ window.API=(function(){
     subs.forEach(function(s){h+='<tr><td><strong>'+esc(s.plan)+'</strong><br><small>'+esc(s.id)+'</small></td><td>'+esc(s.clientName)+'</td><td>'+usd(s.amount)+' / month</td><td>'+(s.status==='cancelled'?'-':fmt(s.next))+'</td><td><select data-ss="'+esc(s.id)+'" aria-label="Status of '+esc(s.id)+'">'+['active','due','overdue','cancelled'].map(function(x){return '<option'+(s.status===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></td></tr>'});
     h+='</tbody></table></div>';
     h+='<h3 class="sec">Emails sent by the system</h3><details><summary>Show the latest '+mail.length+'</summary><div class="al-table"><table><thead><tr><th>Time</th><th>To</th><th>Subject</th><th>Status</th></tr></thead><tbody>'+mail.map(function(m){return '<tr><td>'+fmt(m.created_at)+'</td><td>'+esc(m.to_addr)+'</td><td>'+esc(m.subject)+'</td><td>'+esc(m.status)+(m.error?'<br><small>'+esc(m.error)+'</small>':'')+'</td></tr>'}).join('')+'</tbody></table></div></details><p class="bk-note">Status "logged" means no email key is set on the server, so the message was saved but not sent.</p>';
+    h+='<h3 class="sec">Payment webhook events</h3><div class="al-bar"><span class="grow">Recent payment events, including duplicates. Replaying a processed event should never record a second payment.</span><button class="btn small" id="ba-replay-api" type="button">Replay last processed event</button></div><div class="al-table"><table><thead><tr><th>Time</th><th>Event ID</th><th>Type</th><th>Invoice</th><th>Result</th></tr></thead><tbody>'+(evs.length?evs.slice(0,12).map(function(e){return '<tr><td>'+fmt(e.at||e.createdAt)+'</td><td>'+esc(e.id)+'</td><td>'+esc(e.type)+'</td><td>'+esc(e.invoice||e.invoiceId)+'</td><td>'+esc(e.result||e.status)+'</td></tr>'}).join(''):'<tr><td colspan="5">No webhook events recorded.</td></tr>')+'</tbody></table></div>';
     body.innerHTML=h;bindSignOut(body,openBilling);
     var f=document.getElementById('ba-form');
     if(f)f.onsubmit=async function(e){e.preventDefault();var a=Math.round(parseFloat(document.getElementById('ba-a').value)*100);if(!(a>0))return;
@@ -1989,9 +2086,9 @@ window.API=(function(){
     body.querySelectorAll('[data-ss]').forEach(function(s){s.onchange=async function(){try{await API.call('PATCH','/api/admin/subscriptions/'+encodeURIComponent(s.dataset.ss),{status:s.value});toast('Status saved.')}catch(er){toast(API.text(er))}openBilling()}});
     document.getElementById('ba-run').onclick=async function(){try{var r=await API.post('/api/admin/billing/run');toast(r.invoiced.length+' invoice(s) issued, '+r.markedOverdue+' service(s) marked overdue.')}catch(er){toast(API.text(er))}openBilling()};
     document.getElementById('ba-csv').onclick=function(){API.download('/api/admin/invoices.csv','vintage-invoices.csv').catch(function(er){toast(API.text(er))})};
-    var rp=document.getElementById('ba-replay');
-    if(rp)rp.onclick=async function(){var last=evs.filter(function(e){return /^payment\./.test(e.type)&&e.invoice&&e.result==='processed'})[0];if(!last){toast('No event to replay.');return}
-      try{var r=await API.post('/api/admin/demo/event',{invoiceId:last.invoice,type:last.type,eventId:last.id});toast(r.result==='duplicate ignored'?'Replay ignored: no second payment recorded.':'Replay result: '+r.result)}catch(er){toast(API.text(er))}openBilling()};
+    var replay=document.getElementById('ba-replay-api');
+    if(replay)replay.onclick=async function(){var last=evs.filter(function(e){return /^payment\./.test(e.type||'')&&(e.invoice||e.invoiceId)&&(e.result==='processed'||e.status==='processed')})[0];if(!last){toast('No processed payment event is available to replay.');return}
+      replay.disabled=true;try{var r=await API.post('/api/admin/demo/event',{invoiceId:last.invoice||last.invoiceId,type:last.type,eventId:last.id});toast(r.result==='duplicate ignored'?'Replay ignored: no second payment recorded.':'Replay result: '+(r.result||'completed'))}catch(er){toast(API.text(er))}openBilling()};
   }
 
   /* ---------- Vintage Books ---------- */
@@ -2113,9 +2210,210 @@ window.API=(function(){
       try{await API.call('PUT','/api/admin/books/settings',{large:Math.round(+document.getElementById('ss-l').value*100)||50000,vat:+document.getElementById('ss-v').value||0,vatOn:document.getElementById('ss-on').checked,accountantEmail:document.getElementById('ss-e').value.trim()});await loadSettings();toast('Saved.');renderBooks()}catch(er){toast(API.text(er))}};
   }
 
+  /* ---------- custom orders ---------- */
+  var STAGE={requested:['Waiting for our quote','due'],quoted:['Quote ready','due'],deposit_pending:['Deposit to pay','unpaid'],in_progress:['In progress','active'],balance_pending:['Delivered, balance to pay','unpaid'],completed:['Completed','paid'],cancelled:['Cancelled','void'],declined:['Declined','void']};
+  function stageTag(s){var x=STAGE[s]||[s,'void'];return '<span class="st '+x[1]+'">'+esc(x[0])+'</span>'}
+  function fsize(n){return n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'}
+  function ftime(d){return d?new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}
+  function quoteTable(q){
+    return '<table class="bank-t pp-sum">'+q.items.map(function(i){return '<tr><td>'+esc(i.label)+'</td><td>'+usd(i.amount)+'</td></tr>'}).join('')+
+      '<tr class="hl"><td>Total</td><td>'+usd(q.total)+'</td></tr>'+
+      '<tr><td>Deposit to start ('+q.depositPercent+'%)</td><td>'+usd(q.deposit)+'</td></tr>'+
+      (q.balance>0?'<tr><td>Balance, due when we deliver</td><td>'+usd(q.balance)+'</td></tr>':'')+'</table>';
+  }
+  function threadHtml(o){
+    if(!o.messages.length)return '<p class="lead">No messages yet.</p>';
+    return o.messages.map(function(m){return '<div class="pp-card" style="margin:8px 0"><small>'+esc(m.name)+' · '+ftime(m.at)+(m.kind==='revision'?' · <strong>revision request</strong>':'')+'</small><div style="white-space:pre-wrap;margin-top:4px">'+esc(m.body)+'</div></div>'}).join('');
+  }
+  function fileList(o,base,who){
+    var fs=o.files;if(!fs.length)return '<p class="lead">No files attached.</p>';
+    return '<ul>'+fs.map(function(f){return '<li><button class="btn mini" type="button" data-fdl="'+f.id+'" data-fn="'+esc(f.name)+'">'+esc(f.name)+'</button> <small>'+esc(f.kind==='delivery'?'final file':'brief')+' · '+fsize(f.size)+'</small></li>'}).join('')+'</ul>';
+  }
+  function bindFiles(body,base,o){
+    body.querySelectorAll('[data-fdl]').forEach(function(b){b.onclick=async function(){try{await API.download(base+'/files/'+b.dataset.fdl,b.dataset.fn)}catch(e){toast(API.text(e))}}});
+  }
+  async function uploadAll(path,input){
+    var fl=input&&input.files?Array.prototype.slice.call(input.files):[];
+    for(var k=0;k<fl.length;k++){
+      if(fl[k].size>5*1024*1024){toast(fl[k].name+' is larger than 5 MB and was skipped.');continue}
+      try{await API.upload(path+'?name='+encodeURIComponent(fl[k].name),fl[k])}catch(e){toast(fl[k].name+': '+API.text(e))}
+    }
+  }
+  var FILE_HELP='JPG, PNG, WebP, PDF or ZIP/Office files, up to 5 MB each.';
+
+  /* client: list inside the portal */
+  async function fillCustom(body){
+    var bx=body.querySelector('#co-box');if(!bx)return;
+    try{
+      var r=await API.get('/api/portal/custom-orders');
+      var h='<p class="lead">Need something that is not in our packages? Tell us what you need and we will send an itemised quote. You pay a '+r.depositPercent+'% deposit to start and the balance when we deliver. <button class="btn small" type="button" id="co-new">Request a custom order</button></p>';
+      if(r.orders.length){
+        h+='<div class="al-table"><table><thead><tr><th>Order</th><th>Status</th><th>Total</th><th>Paid</th><th></th></tr></thead><tbody>'+r.orders.map(function(o){
+          return '<tr><td><strong>'+esc(o.title)+'</strong><br><small>'+esc(o.id)+' · '+esc(o.service)+'</small></td><td>'+stageTag(o.stage)+'</td><td>'+(o.total==null?'-':usd(o.total))+'</td><td>'+(o.total==null?'-':usd(o.paid))+'</td><td><button class="btn mini" type="button" data-co="'+esc(o.id)+'">Open</button></td></tr>'}).join('')+'</tbody></table></div>';
+      }
+      bx.innerHTML=h;
+      bx.querySelector('#co-new').onclick=function(){customForm(r)};
+      bx.querySelectorAll('[data-co]').forEach(function(b){b.onclick=function(){openCustomOrder(b.dataset.co)}});
+    }catch(e){bx.innerHTML=note(esc(API.text(e)))}
+  }
+  function customForm(r){
+    var body=show('portal');
+    body.innerHTML='<div class="eyebrow">Custom order</div><h2>Tell us what you need</h2><p class="lead"><button class="btn mini" type="button" id="cf-back">Back to your account</button></p>'+
+      '<form class="bp-form" id="cf-f" '+FORM+'><div><label for="cf-t">Title</label><input id="cf-t" required minlength="3" maxlength="120" placeholder="e.g. Online shop for my bakery"></div>'+
+      '<div><label for="cf-s">Type of work</label><select id="cf-s">'+r.services.map(function(s){return '<option>'+esc(s)+'</option>'}).join('')+'</select></div>'+
+      '<div><label for="cf-d">What do you need?</label><textarea id="cf-d" rows="6" required minlength="20" maxlength="4000" placeholder="Describe the goal, who it is for, pages or features, and anything you already have."></textarea></div>'+
+      '<div><label for="cf-b">Budget (optional)</label><input id="cf-b" maxlength="80" placeholder="e.g. $800"></div>'+
+      '<div><label for="cf-dl">Deadline (optional)</label><input id="cf-dl" maxlength="80" placeholder="e.g. End of January"></div>'+
+      '<div><label for="cf-f2">Files, such as a brief or references (optional)</label><input id="cf-f2" type="file" multiple accept="image/*,.pdf,.zip,.docx,.xlsx,.pptx"><small>'+FILE_HELP+'</small></div>'+
+      '<div class="al-err" id="cf-err" role="alert" hidden></div><div><button class="btn small" type="submit" id="cf-go">Send request</button></div></form>';
+    document.getElementById('cf-back').onclick=function(){openPortal()};
+    document.getElementById('cf-f').onsubmit=async function(ev){ev.preventDefault();setErr('cf-err','');var bt=document.getElementById('cf-go');bt.disabled=true;
+      try{
+        var res=await API.post('/api/portal/custom-orders',{title:document.getElementById('cf-t').value.trim(),service:document.getElementById('cf-s').value,description:document.getElementById('cf-d').value.trim(),budget:document.getElementById('cf-b').value.trim(),deadline:document.getElementById('cf-dl').value.trim()});
+        await uploadAll('/api/portal/custom-orders/'+res.order.id+'/files',document.getElementById('cf-f2'));
+        toast('Request sent. We will reply with a quote.');openCustomOrder(res.order.id);
+      }catch(e){setErr('cf-err',API.text(e)+(e.fields?' '+Object.keys(e.fields).map(function(k){return e.fields[k]}).join(' '):''));bt.disabled=false}};
+  }
+  async function openCustomOrder(id){
+    var body=show('portal'),g=gen;body.innerHTML='<p class="lead">Loading…</p>';
+    var u=await needUser(body,'client','Client portal',function(){openCustomOrder(id)});if(!u||stale(g))return;
+    var d;try{d=await API.get('/api/portal/custom-orders/'+encodeURIComponent(id))}catch(e){if(stale(g))return;body.innerHTML=note(esc(API.text(e)))+'<p><button class="btn mini" type="button" id="co-back">Back to your account</button></p>';document.getElementById('co-back').onclick=function(){openPortal()};return}
+    if(stale(g))return;
+    var o=d.order,base='/api/portal/custom-orders/'+encodeURIComponent(o.id),q=o.quote,open=o.status!=='cancelled'&&o.status!=='declined';
+    var h='<div class="eyebrow">Custom order '+esc(o.id)+'</div><h2>'+esc(o.title)+'</h2><p class="lead">'+stageTag(o.stage)+' <button class="btn mini" type="button" id="co-back">Back to your account</button></p>';
+    if(o.cancelRequestedAt&&o.status!=='cancelled')h+=note('You asked to cancel this order. We will confirm and arrange the refund by email.');
+    h+='<div class="pp-card"><h4>Your request</h4><p style="white-space:pre-wrap">'+esc(o.description)+'</p><small>'+esc(o.service)+(o.budget?' · Budget: '+esc(o.budget):'')+(o.deadline?' · Deadline: '+esc(o.deadline):'')+'</small></div>';
+    h+='<h3 class="sec">Files</h3>'+fileList(o);
+    if(open&&o.status!=='delivered')h+='<div class="bp-form" style="grid-template-columns:1fr;max-width:420px"><div><label for="co-up">Add files</label><input id="co-up" type="file" multiple accept="image/*,.pdf,.zip,.docx,.xlsx,.pptx"><small>'+FILE_HELP+'</small></div><div><button class="btn small" type="button" id="co-upgo">Upload</button></div></div>';
+    if(q){
+      h+='<h3 class="sec">Quote</h3><div class="pp-card">'+quoteTable(q)+(q.timelineDays?'<p><small>Estimated time: '+q.timelineDays+' days · Revisions included: '+o.revisions.included+'</small></p>':'<p><small>Revisions included: '+o.revisions.included+'</small></p>')+(q.note?'<p style="white-space:pre-wrap">'+esc(q.note)+'</p>':'')+
+        (o.status==='quoted'?'<p><small>'+(q.expired?'This quote expired on '+fmt(q.expiresAt)+'. Ask us for a new one in the messages below.':'Valid until '+fmt(q.expiresAt))+'</small></p>':'')+'</div>';
+      if(o.status==='quoted'&&!q.expired)h+='<p><button class="btn small" type="button" id="co-acc">Accept quote and pay deposit ('+usd(q.deposit)+')</button> <button class="btn mini" type="button" id="co-dec">Decline</button></p>';
+    }
+    if(d.depositInvoice||d.balanceInvoice){
+      h+='<h3 class="sec">Payment</h3><div class="pp-card"><div class="pp-bar" role="img" aria-label="'+Math.round(o.payment.paid/(q?q.total:1)*100)+'% paid"><i style="width:'+Math.round(o.payment.paid/(q?q.total:1)*100)+'%"></i></div><table class="bank-t pp-sum">'+
+        [['Deposit',d.depositInvoice],['Final balance',d.balanceInvoice]].filter(function(x){return x[1]}).map(function(x){var i=x[1];return '<tr><td>'+x[0]+' ('+usd(i.amount)+')<br><small>'+esc(i.id)+'</small></td><td><span class="st '+istat(i)+'">'+istat(i)+'</span> '+(i.status==='unpaid'?'<button class="btn mini" type="button" data-pay="'+esc(i.id)+'">Pay by bank transfer</button>':'')+(i.status==='unpaid'&&i.transferReportedAt?'<br><small>Transfer reported, waiting for the money to arrive</small>':'')+'</td></tr>'}).join('')+
+        (o.status==='accepted'&&o.payment.balanceStatus==='not_due'&&q&&q.balance>0?'<tr><td>Final balance ('+usd(q.balance)+')</td><td>Invoiced when we deliver</td></tr>':'')+
+        '<tr class="hl"><td>Paid so far</td><td>'+usd(o.payment.paid)+'</td></tr><tr class="hl"><td>Still to pay</td><td>'+usd(o.payment.remaining)+'</td></tr></table></div>';
+    }
+    if(o.status==='delivered'){
+      h+='<h3 class="sec">Delivery</h3>';
+      if(o.deliveryReleased)h+='<div class="pp-card"><p>Your order is complete. Thank you.</p>'+(o.deliveryNote?'<p style="white-space:pre-wrap">'+esc(o.deliveryNote)+'</p>':'')+(o.deliveryFileCount?'<p><small>Your final files are listed under Files above.</small></p>':'')+'</div>';
+      else h+=note('Your order is ready. Your final files'+(o.deliveryFileCount?' ('+o.deliveryFileCount+')':'')+' will be released as soon as the final balance has been paid and confirmed.');
+    }
+    h+='<h3 class="sec">Messages</h3>'+threadHtml(o);
+    if(open){
+      var canRev=o.stage==='in_progress'||o.stage==='balance_pending';
+      h+='<form class="bp-form" id="co-msg" '+FORM+'><div><label for="co-m">Write to us</label><textarea id="co-m" rows="3" maxlength="2000" required></textarea></div>'+
+        (canRev?'<div><label><input type="checkbox" id="co-rev"> This is a revision request ('+o.revisions.used+' of '+o.revisions.included+' included rounds used'+(o.revisions.extra?'; extra rounds are charged as agreed in the quote':'')+')</label></div>':'')+
+        '<div><button class="btn small" type="submit">Send</button></div></form>';
+    }
+    if(open&&o.status!=='delivered'&&!o.cancelRequestedAt){
+      var paid=o.payment.depositStatus==='paid';
+      h+='<h3 class="sec">Cancel this order</h3><div class="pp-card"><p><small>'+(paid?'Before work starts we refund '+o.refundPolicyPercent+'% of your deposit. After work has started, the refund depends on the work already done and we will agree it with you.':'You have not paid yet, so you can cancel at no cost.')+'</small></p><textarea id="co-cr" rows="2" maxlength="500" placeholder="Reason (optional)" style="width:100%"></textarea><p><button class="btn mini" type="button" id="co-cx">Cancel order</button></p></div>';
+    }
+    body.innerHTML=h;
+    var again=function(){openCustomOrder(o.id)};
+    document.getElementById('co-back').onclick=function(){openPortal()};
+    bindFiles(body,base,o);
+    var ug=document.getElementById('co-upgo');if(ug)ug.onclick=async function(){ug.disabled=true;await uploadAll(base+'/files',document.getElementById('co-up'));again()};
+    var ac=document.getElementById('co-acc');if(ac)ac.onclick=async function(){ac.disabled=true;
+      try{var r=await API.post(base+'/accept');toast('Quote accepted. Please pay the deposit to start.');var n=await API.get(base);payInvoice(n.depositInvoice,again)}catch(e){toast(API.text(e));again()}};
+    var dc=document.getElementById('co-dec');if(dc)dc.onclick=async function(){if(!dc.dataset.armed){dc.dataset.armed=1;dc.textContent='Confirm decline';return}
+      try{await API.post(base+'/decline');toast('Quote declined.')}catch(e){toast(API.text(e))}again()};
+    body.querySelectorAll('[data-pay]').forEach(function(b){b.onclick=function(){var i=[d.depositInvoice,d.balanceInvoice].filter(function(x){return x&&x.id===b.dataset.pay})[0];payInvoice(i,again)}});
+    var mf=document.getElementById('co-msg');if(mf)mf.onsubmit=async function(ev){ev.preventDefault();var rv=document.getElementById('co-rev');
+      try{await API.post(base+'/messages',{body:document.getElementById('co-m').value.trim(),kind:rv&&rv.checked?'revision':'message'});toast('Sent.')}catch(e){toast(API.text(e))}again()};
+    var cx=document.getElementById('co-cx');if(cx)cx.onclick=async function(){if(!cx.dataset.armed){cx.dataset.armed=1;cx.textContent='Confirm cancel';return}
+      try{var r=await API.post(base+'/cancel',{reason:document.getElementById('co-cr').value.trim()});toast(r.cancelled?'Order cancelled.':'Cancellation requested. We will confirm by email.')}catch(e){toast(API.text(e))}again()};
+  }
+
+  /* owner: custom orders (#admin-orders) */
+  var coF={status:''};
+  async function openOrders(){
+    var body=show('orders'),g=gen;body.innerHTML='<p class="lead">Loading…</p>';
+    var u=await needUser(body,'owner','Owner sign-in',openOrders);if(!u||stale(g))return;
+    var d;try{d=await API.get('/api/admin/custom-orders'+(coF.status?'?status='+encodeURIComponent(coF.status):''))}catch(e){if(stale(g))return;if(e.status===401){openOrders();return}body.innerHTML=note(esc(API.text(e)));return}
+    if(stale(g))return;
+    var h='<div class="eyebrow">Admin</div><h2>Custom orders</h2><p class="lead">Send a quote, confirm the deposit, deliver, then the balance. '+signOutBtn()+'</p><div class="al-bar"><select id="co-s" aria-label="Filter by status">'+[['','All'],['requested','Requested'],['quoted','Quoted'],['accepted','Accepted'],['delivered','Delivered'],['cancelled','Cancelled'],['declined','Declined']].map(function(x){return '<option value="'+x[0]+'"'+(coF.status===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select><span class="grow">'+d.orders.length+' orders</span></div>';
+    if(!d.orders.length)h+='<div class="al-table"><div class="al-empty">No custom orders yet. They appear here when a client sends a request from their portal.</div></div>';
+    else h+='<div class="al-table"><table><thead><tr><th>Order</th><th>Client</th><th>Status</th><th>Total</th><th>Paid</th><th></th></tr></thead><tbody>'+d.orders.map(function(o){return '<tr><td><strong>'+esc(o.title)+'</strong><br><small>'+esc(o.id)+' · '+esc(o.service)+'</small></td><td>'+esc(o.clientName)+'</td><td>'+stageTag(o.stage)+(o.cancelRequested?'<br><small><strong>Cancellation requested</strong></small>':'')+'</td><td>'+(o.total==null?'-':usd(o.total))+'</td><td>'+(o.total==null?'-':usd(o.paid))+'</td><td><button class="btn mini" type="button" data-oo="'+esc(o.id)+'">Open</button></td></tr>'}).join('')+'</tbody></table></div>';
+    body.innerHTML=h;bindSignOut(body,openOrders);
+    document.getElementById('co-s').onchange=function(e){coF.status=e.target.value;openOrders()};
+    body.querySelectorAll('[data-oo]').forEach(function(b){b.onclick=function(){openOrderAdmin(b.dataset.oo)}});
+  }
+  function qLine(l,a){return '<div class="al-bar" data-line><input class="ql" placeholder="Item, e.g. Design" maxlength="120" value="'+esc(l||'')+'" style="flex:2;min-height:40px" aria-label="Item"><input class="qa" type="number" min="1" step="1" placeholder="USD" value="'+(a||'')+'" style="flex:1;min-height:40px" aria-label="Price in dollars"></div>'}
+  async function openOrderAdmin(id){
+    var body=show('orders'),g=gen;body.innerHTML='<p class="lead">Loading…</p>';
+    var u=await needUser(body,'owner','Owner sign-in',function(){openOrderAdmin(id)});if(!u||stale(g))return;
+    var d;try{d=await API.get('/api/admin/custom-orders/'+encodeURIComponent(id))}catch(e){if(stale(g))return;body.innerHTML=note(esc(API.text(e)));return}
+    if(stale(g))return;
+    var o=d.order,q=o.quote,base='/api/admin/custom-orders/'+encodeURIComponent(o.id),open=o.status!=='cancelled'&&o.status!=='declined';
+    var h='<div class="eyebrow">Admin</div><h2>'+esc(o.title)+'</h2><p class="lead">'+esc(o.id)+' · '+stageTag(o.stage)+' · '+esc(d.client.name)+' ('+esc(d.client.email)+') <button class="btn mini" type="button" id="oa-back">All custom orders</button></p>';
+    if(o.cancelRequestedAt&&o.status!=='cancelled')h+=note('<strong>The client asked to cancel.</strong> '+esc(o.cancelReason||'')+'<br>Suggested refund: '+usd(o.refundSuggestionCents/100)+(o.startedAt?' (work had started, so decide the amount yourself).':' ('+o.refundPolicyPercent+'% of the deposit, work not started).'));
+    h+='<div class="pp-card"><h4>Request</h4><p style="white-space:pre-wrap">'+esc(o.description)+'</p><small>'+esc(o.service)+(o.budget?' · Budget: '+esc(o.budget):'')+(o.deadline?' · Deadline: '+esc(o.deadline):'')+'</small></div>';
+    h+='<h3 class="sec">Files</h3>'+fileList(o);
+    if(q&&o.status!=='requested')h+='<h3 class="sec">Current quote</h3><div class="pp-card">'+quoteTable(q)+'<p><small>Revisions included: '+o.revisions.included+' (used '+o.revisions.used+(o.revisions.extra?', '+o.revisions.extra+' extra to charge':'')+')'+(q.timelineDays?' · '+q.timelineDays+' days':'')+' · valid until '+fmt(q.expiresAt)+'</small></p></div>';
+    if(o.status==='requested'||o.status==='quoted'){
+      var pre=q?q.items:[{label:'',amount:''}];
+      h+='<h3 class="sec">'+(q?'Replace the quote':'Send a quote')+'</h3><div class="bp-form" style="grid-template-columns:1fr;max-width:560px"><div id="qlines">'+pre.map(function(i){return qLine(i.label,i.amount)}).join('')+'</div><div><button class="btn mini" type="button" id="q-add">Add a line</button></div>'+
+        '<div><label for="q-note">Note to the client (optional)</label><textarea id="q-note" rows="3" maxlength="2000">'+esc(q?q.note:'')+'</textarea></div>'+
+        '<div><label for="q-days">Valid for (days)</label><input id="q-days" type="number" min="1" max="90" value="14"></div><div><label for="q-tl">Estimated time (days, optional)</label><input id="q-tl" type="number" min="1" max="730" value="'+(q&&q.timelineDays||'')+'"></div><div><label for="q-rev">Revision rounds included</label><input id="q-rev" type="number" min="0" max="20" value="'+o.revisions.included+'"></div>'+
+        '<div><small id="q-sum"></small></div><div><button class="btn small" type="button" id="q-send">'+(q?'Send updated quote':'Send quote')+'</button> <button class="btn mini" type="button" id="q-rej">Decline request</button></div></div>';
+    }
+    if(d.depositInvoice||d.balanceInvoice){
+      h+='<h3 class="sec">Payment</h3><div class="pp-card"><table class="bank-t pp-sum">'+[['Deposit',d.depositInvoice],['Final balance',d.balanceInvoice]].filter(function(x){return x[1]}).map(function(x){var i=x[1];
+        return '<tr><td>'+x[0]+' ('+usd(i.amount)+')<br><small>'+esc(i.id)+'</small></td><td><span class="st '+istat(i)+'">'+istat(i)+'</span>'+(i.status==='unpaid'?' <button class="btn mini" type="button" data-pf="'+esc(i.id)+'">View proof</button> <button class="btn mini" type="button" data-mp="'+esc(i.id)+'">Mark paid</button>':'')+'</td></tr>'}).join('')+'</table><div id="pf-box"></div><p><small>Mark paid only when the money is in your FBC account.</small></p></div>';
+    }
+    if(o.stage==='in_progress'){
+      h+='<h3 class="sec">Work</h3>'+(o.startedAt?'<p class="lead">Started '+fmt(o.startedAt)+'.</p>':'<p><button class="btn small" type="button" id="oa-start">Start work (emails the client)</button></p>')+
+        '<div class="bp-form" style="grid-template-columns:1fr;max-width:560px"><div><label for="dl-f">Final files (locked for the client until the balance is paid)</label><input id="dl-f" type="file" multiple accept="image/*,.pdf,.zip,.docx,.xlsx,.pptx"><small>'+FILE_HELP+'</small></div><div><label for="dl-n">Delivery note or link (shown after payment)</label><textarea id="dl-n" rows="3" maxlength="2000"></textarea></div><div><button class="btn small" type="button" id="oa-del">Mark delivered'+(q&&q.balance>0?' and invoice the balance ('+usd(q.balance)+')':'')+'</button></div></div>';
+    }
+    if(o.status==='delivered')h+='<h3 class="sec">Delivery</h3><div class="pp-card"><p>Delivered '+fmt(o.deliveredAt)+'. Files '+(o.deliveryReleased?'<strong>released</strong> to the client.':'are <strong>locked</strong> until the balance is paid.')+'</p>'+(o.deliveryNote?'<p style="white-space:pre-wrap">'+esc(o.deliveryNote)+'</p>':'')+'</div>';
+    h+='<h3 class="sec">Messages</h3>'+threadHtml(o);
+    if(open)h+='<form class="bp-form" id="oa-msg" '+FORM+'><div><label for="oa-m">Reply to the client</label><textarea id="oa-m" rows="3" maxlength="2000" required></textarea></div><div><button class="btn small" type="submit">Send</button></div></form>';
+    if(o.status==='accepted'||o.status==='quoted'||o.status==='requested'){
+      var paidDep=o.payment.depositStatus==='paid';
+      h+='<h3 class="sec">Cancel order</h3><div class="pp-card">'+(paidDep?'<label for="oc-r">Refund to the client (USD, deposit paid '+usd(q.deposit)+')</label><input id="oc-r" type="number" min="0" step="1" value="'+(o.refundSuggestionCents/100)+'">':'<p><small>No deposit has been paid. Any unpaid deposit invoice is voided.</small></p>')+'<textarea id="oc-n" rows="2" maxlength="500" placeholder="Reason (optional, included in the email)" style="width:100%"></textarea><p><button class="btn mini" type="button" id="oc-go">Cancel order</button> '+(paidDep?'<small>Send the refund from your bank yourself. This only records it.</small>':'')+'</p></div>';
+    }
+    body.innerHTML=h;
+    var again=function(){openOrderAdmin(o.id)};
+    document.getElementById('oa-back').onclick=openOrders;
+    bindFiles(body,base,o);
+    function sum(){var t=0;body.querySelectorAll('.qa').forEach(function(i){t+=Math.round(parseFloat(i.value||0))||0});var s=document.getElementById('q-sum');if(s)s.textContent='Total '+usd(t)+(t>0?' · deposit '+usd(Math.round(t*(q?q.depositPercent:45)/100))+' · balance '+usd(t-Math.round(t*(q?q.depositPercent:45)/100)):'')}
+    function wire(){body.querySelectorAll('.qa').forEach(function(i){i.oninput=sum});sum()}
+    wire();
+    var add=document.getElementById('q-add');if(add)add.onclick=function(){document.getElementById('qlines').insertAdjacentHTML('beforeend',qLine('',''));wire()};
+    var qs=document.getElementById('q-send');if(qs)qs.onclick=async function(){
+      var items=[];body.querySelectorAll('[data-line]').forEach(function(r){var l=r.querySelector('.ql').value.trim(),a=Math.round(parseFloat(r.querySelector('.qa').value)*100);if(l&&a>0)items.push({label:l,amountCents:a})});
+      if(!items.length){toast('Add at least one line with a price.');return}
+      qs.disabled=true;
+      try{await API.post(base+'/quote',{items:items,note:document.getElementById('q-note').value.trim(),validDays:parseInt(document.getElementById('q-days').value,10)||14,timelineDays:document.getElementById('q-tl').value?parseInt(document.getElementById('q-tl').value,10):null,revisions:parseInt(document.getElementById('q-rev').value,10)||0});toast('Quote sent to the client.')}catch(e){toast(API.text(e))}again()};
+    var rj=document.getElementById('q-rej');if(rj)rj.onclick=async function(){if(!rj.dataset.armed){rj.dataset.armed=1;rj.textContent='Confirm decline';return}
+      try{await API.post(base+'/reject',{reason:document.getElementById('q-note').value.trim()});toast('Request declined.')}catch(e){toast(API.text(e))}again()};
+    body.querySelectorAll('[data-mp]').forEach(function(b){b.onclick=async function(){if(!b.dataset.armed){b.dataset.armed=1;b.textContent='Confirm: money received';return}
+      try{await API.post('/api/admin/invoices/'+encodeURIComponent(b.dataset.mp)+'/mark-paid');toast('Marked paid. The client was emailed.')}catch(e){toast(API.text(e))}again()}});
+    body.querySelectorAll('[data-pf]').forEach(function(b){b.onclick=async function(){var pb=document.getElementById('pf-box');b.disabled=true;
+      try{var l=await API.get('/api/admin/invoices/'+encodeURIComponent(b.dataset.pf)+'/proofs');pb.innerHTML='';
+        if(!l.proofs.length)pb.innerHTML='<p><small>No proof of payment photo attached yet.</small></p>';
+        for(var k=0;k<l.proofs.length;k++){var bl=await API.call('GET','/api/admin/proofs/'+l.proofs[k].id,undefined,{blob:true});pb.insertAdjacentHTML('beforeend','<div class="pf-view"><small>Sent '+fmt(l.proofs[k].at)+'</small><img src="'+URL.createObjectURL(bl)+'" alt="Proof of payment photo"></div>')}}
+      catch(e){toast(API.text(e))}b.disabled=false}});
+    var st=document.getElementById('oa-start');if(st)st.onclick=async function(){try{await API.post(base+'/start');toast('Work started. The client was emailed.')}catch(e){toast(API.text(e))}again()};
+    var dv=document.getElementById('oa-del');if(dv)dv.onclick=async function(){if(!dv.dataset.armed){dv.dataset.armed=1;dv.textContent='Confirm delivery';return}dv.disabled=true;
+      await uploadAll(base+'/files',document.getElementById('dl-f'));
+      try{await API.post(base+'/deliver',{note:document.getElementById('dl-n').value.trim()});toast('Delivered. The client was emailed'+(q&&q.balance>0?' with the balance invoice.':'.'))}catch(e){toast(API.text(e))}again()};
+    var mf=document.getElementById('oa-msg');if(mf)mf.onsubmit=async function(ev){ev.preventDefault();
+      try{await API.post(base+'/messages',{body:document.getElementById('oa-m').value.trim()});toast('Sent.')}catch(e){toast(API.text(e))}again()};
+    var oc=document.getElementById('oc-go');if(oc)oc.onclick=async function(){if(!oc.dataset.armed){oc.dataset.armed=1;oc.textContent='Confirm cancel';return}
+      var rf=document.getElementById('oc-r'),b2={reason:document.getElementById('oc-n').value.trim()};if(rf)b2.refundCents=Math.round(parseFloat(rf.value||0)*100);
+      try{var r=await API.post(base+'/cancel',b2);toast('Order cancelled'+(r.refundCents?'. Remember to send the refund of '+usd(r.refundCents/100)+' from the bank.':'.'))}catch(e){toast(API.text(e))}again()};
+  }
+
   /* ---------- routing ---------- */
   function route(){
     var h=location.hash,m;
+    if((m=h.match(/^#order-(CO-\d+)$/)))return openCustomOrder(m[1]);
+    if(h==='#admin-orders')return openOrders();
     if((m=h.match(/^#verify=(.+)$/)))return doVerify(decodeURIComponent(m[1]));
     if((m=h.match(/^#reset=(.+)$/)))return showReset(decodeURIComponent(m[1]));
     var paid=new URLSearchParams(location.search).get('paid');
@@ -2127,6 +2425,7 @@ window.API=(function(){
     else hide();
   }
   /* The old close buttons only hide the view; keep our state in step. */
+  document.getElementById('co-x').addEventListener('click',function(){history.replaceState(null,'',location.pathname+location.search);hide()});
   document.querySelectorAll('[data-bpx],#al-x,#bk-x').forEach(function(b){b.addEventListener('click',function(){cur=null;gen++})});
   addEventListener('hashchange',route);
 
