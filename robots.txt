@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /app/
+
+# AI training crawlers are not permitted; search and answer-engine retrieval bots are welcome.
+User-agent: GPTBot
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+User-agent: CCBot
+Disallow: /
+User-agent: ClaudeBot
+Disallow: /
+User-agent: anthropic-ai
+Disallow: /
+
+Sitemap: https://vintageadvertising.online/sitemap.xml

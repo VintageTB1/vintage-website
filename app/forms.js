@@ -86,8 +86,8 @@
       var u = API.user;
       if (!u) { body.innerHTML = '<div class="eyebrow">Sign in</div><h2>Please sign in first</h2><p class="lead">Sign in to your account to continue.</p><p><a class="btn small gold" href="#portal">Sign in</a></p>'; return; }
       var admin = r[0][0] === 'a';
-      if (admin && u.role !== 'owner') { body.innerHTML = '<h2>Not available</h2><p class="lead">This area is for the Vintage Advertising team.</p>'; return; }
-      if (!admin && u.role === 'owner') { body.innerHTML = '<h2>Client area</h2><p class="lead">This is the client view. Use <a class="vf-link" href="#admin-forms">Client Onboarding Management</a> or <a class="vf-link" href="#admin-handovers">Handover Management</a>.</p>'; return; }
+      if (admin && !(u.role === 'owner' || u.role === 'admin' || u.role === 'staff')) { body.innerHTML = '<h2>Not available</h2><p class="lead">This area is for the Vintage Advertising team.</p>'; return; }
+      if (!admin && u.role !== 'client') { body.innerHTML = '<h2>Client area</h2><p class="lead">This is the client view. Use <a class="vf-link" href="#admin-forms">Client Onboarding Management</a> or <a class="vf-link" href="#admin-handovers">Handover Management</a>.</p>'; return; }
       var fn = { hub: hub, form: formPage, hoList: hoList, hoView: hoView, aList: aList, aClient: aClient, aForm: aForm, aHoList: aHoList, aHo: aHo }[r[0]];
       fn(g, r[1], r[2]);
     });
@@ -533,7 +533,7 @@
       pb.insertBefore(c, pb.children[2] || null);
     }
     var ab = q('#ba-body');
-    if (ab && u.role === 'owner' && !q('#vf-aentry', ab) && ab.children.length > 2) {
+    if (ab && (u.role === 'owner' || u.role === 'admin' || u.role === 'staff') && !q('#vf-aentry', ab) && ab.children.length > 2) {
       var a = document.createElement('div'); a.id = 'vf-aentry'; a.className = 'vf-hub';
       a.innerHTML = '<button class="btn small gold" data-vfgo="#admin-forms">Client Onboarding Management</button> <button class="btn small" data-vfgo="#admin-handovers">Handover Management</button>';
       ab.insertBefore(a, ab.children[2] || null);
