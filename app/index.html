@@ -1603,9 +1603,6 @@ window.API=(function(){
     body.querySelectorAll('[data-ss]').forEach(function(s){s.onchange=async function(){try{await API.call('PATCH','/api/admin/subscriptions/'+encodeURIComponent(s.dataset.ss),{status:s.value});toast('Status saved.')}catch(er){toast(API.text(er))}openBilling()}});
     document.getElementById('ba-run').onclick=async function(){try{var r=await API.post('/api/admin/billing/run');toast(r.invoiced.length+' invoice(s) issued, '+r.markedOverdue+' service(s) marked overdue.')}catch(er){toast(API.text(er))}openBilling()};
     document.getElementById('ba-csv').onclick=function(){API.download('/api/admin/invoices.csv','vintage-invoices.csv').catch(function(er){toast(API.text(er))})};
-    var replay=document.getElementById('ba-replay-api');
-    if(replay)replay.onclick=async function(){var last=evs.filter(function(e){return /^payment\./.test(e.type||'')&&(e.invoice||e.invoiceId)&&(e.result==='processed'||e.status==='processed')})[0];if(!last){toast('No processed payment event is available to replay.');return}
-      replay.disabled=true;try{var r=await API.post('/api/admin/demo/event',{invoiceId:last.invoice||last.invoiceId,type:last.type,eventId:last.id});toast(r.result==='duplicate ignored'?'Replay ignored: no second payment recorded.':'Replay result: '+(r.result||'completed'))}catch(er){toast(API.text(er))}openBilling()};
   }
 
   /* ---------- Vintage Books ---------- */
@@ -1954,7 +1951,6 @@ window.API=(function(){
 })();
 </script>
 
-<script src="forms.js"></script>
 <script src="forms.js"></script>
 <script src="centre.js"></script>
 <a class="va-bar" href="/" aria-label="Back to the Vintage Advertising website"><img src="/assets/vintage-advertising-monogram.jpg" alt="" width="40" height="40"><b>Vintage Advertising</b><em>&larr; Website</em></a>
