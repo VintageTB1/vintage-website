@@ -30,7 +30,23 @@
 @media(prefers-reduced-motion:reduce){.va-art-photo,.va-art-window:after,.va-demo-hero:before,.va-demo-visual:before{animation:none!important;transition:none!important}}
 
 </style><style>.pp-card .bank-t td{color:#e8ecf4}.pp-card .bank-t td small{color:#9aa6bd}</style>
-</head><body>
+<style id="va-app-shell">
+/* Portal shell: /app/ is the account area only. The old single-page marketing site is hidden here. */
+header.nav,main#top,footer,#va-fab,#loader{display:none!important}
+.va-back{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));left:max(18px,env(safe-area-inset-left,0px));z-index:200;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid rgba(201,168,106,.55);border-radius:999px;background:rgba(10,18,36,.85);color:#e9e2d2;font:500 11px/1 Montserrat,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;text-decoration:none}
+.va-back:hover,.va-back:focus-visible{background:#c9a86a;color:#0b1426}
+</style>
+</head><body class="va-app">
+<script>
+(function(){
+  var h=location.hash.replace("#","");
+  var legal={terms:"/terms-and-conditions/",privacy:"/privacy-policy/",refunds:"/refund-policy/"};
+  addEventListener("hashchange",function(){var k=location.hash.replace("#","");if(legal[k])location.replace(legal[k])});
+  if(legal[h]){location.replace(legal[h]);return}
+  if(!h){try{history.replaceState(null,"",location.pathname+location.search+"#portal")}catch(e){}}
+})();
+</script>
+
 <title>Client Portal | Vintage Advertising</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="canonical" href="https://vintageadvertising.online/app/">
@@ -2438,4 +2454,16 @@ window.API=(function(){
 <script src="forms.js"></script>
 <script src="forms.js"></script>
 <script src="centre.js"></script>
+<a class="va-back" href="/" aria-label="Back to the Vintage Advertising website">&larr; Website</a>
+<script>
+/* After the last panel closes there is nothing behind it any more, so go to the home page. */
+(function(){
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('[data-bpx],#co-x,#bk-x,#pc-x,#ba-x,.bp .close,[data-close]'))return;
+    setTimeout(function(){
+      if(!document.querySelector('.bp.show,.panel.show,#adminleads.show,#legal.show'))location.href='/';
+    },250);
+  },true);
+})();
+</script>
 </body></html>
