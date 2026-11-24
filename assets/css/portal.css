@@ -1,0 +1,64 @@
+/* Client portal skin. Aligns /app/ with the 2.0 design system (assets/css/main.css):
+   Cormorant Garamond headings, Montserrat text, square buttons and cards, hairline borders, one gold accent.
+   Loaded after the portal's own rules, so everything here is scoped to body.va-app. */
+body.va-app{
+  --font-head:'Cormorant Garamond','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  --font-body:'Montserrat','Helvetica Neue',Arial,sans-serif;
+  --silver-dim:rgba(192,192,192,.22);
+  background:#101C36;
+}
+body.va-app h1,body.va-app h2,body.va-app h3,body.va-app h4{font-weight:400;letter-spacing:-.01em}
+body.va-app .bp-in h2{font-size:clamp(2.1rem,4.6vw,3.2rem);margin-bottom:6px}
+body.va-app .bp h3.sec{font-size:clamp(1.5rem,2.4vw,1.9rem);margin:48px 0 14px;padding-top:28px;border-top:1px solid var(--silver-dim)}
+
+/* app bar: logo and "Back to website" on the left, Close on the right */
+body.va-app .bp{padding-top:104px;background:#101C36}
+body.va-app .bp::before{content:"";position:fixed;inset:0 0 auto 0;height:72px;background:#0A1224;border-bottom:1px solid var(--silver-dim);z-index:3}
+body.va-app .bp-in{position:relative;max-width:1120px}
+body.va-app .bp-in>button[style*="position:fixed"]{top:calc(14px + env(safe-area-inset-top,0px))!important;right:max(20px,env(safe-area-inset-right,0px))!important;z-index:5!important}
+.va-bar{position:fixed;top:0;left:0;z-index:200;height:72px;display:flex;align-items:center;gap:14px;padding:0 max(20px,env(safe-area-inset-left,0px));color:#F4F6F8;text-decoration:none}
+.va-bar img{width:40px;height:40px;object-fit:cover;border:1px solid rgba(192,192,192,.3)}
+.va-bar b{font:500 .68rem/1 'Montserrat','Helvetica Neue',Arial,sans-serif;letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
+.va-bar em{font:500 .62rem/1 'Montserrat','Helvetica Neue',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;font-style:normal;color:#C9A86A;white-space:nowrap;padding-left:14px;border-left:1px solid rgba(192,192,192,.3)}
+.va-bar:hover em,.va-bar:focus-visible em{text-decoration:underline;text-underline-offset:4px}
+@media (max-width:640px){.va-bar b{display:none}}
+
+/* buttons: square, letter-spaced, like the public site */
+body.va-app .btn{border-radius:0;min-height:48px;padding:0 26px;font-size:.68rem;letter-spacing:.24em;border:1px solid #C0C0C0;transition:background .25s,color .25s,border-color .25s}
+body.va-app .btn:hover:not([disabled]){background:#C0C0C0;color:#101C36}
+body.va-app .btn.gold{background:#C9A86A;border-color:#C9A86A;color:#101C36}
+body.va-app .btn.gold:hover:not([disabled]){background:#D9BE88;border-color:#D9BE88;color:#101C36}
+body.va-app .btn.small{min-height:42px;padding:0 20px}
+body.va-app .bp .btn.mini{min-height:34px;padding:0 14px;font-size:.62rem}
+body.va-app .btn:focus-visible{outline:2px solid #C0C0C0;outline-offset:3px}
+body.va-app .toast{border-radius:0;background:#C9A86A;color:#101C36;letter-spacing:.04em}
+
+/* cards, tiles and hubs */
+body.va-app .bp-card,body.va-app .vf-card,body.va-app .vf-hub,body.va-app .pp-card,body.va-app .al-table{border-radius:0;border:1px solid var(--silver-dim);background:rgba(255,255,255,.02)}
+body.va-app .vf-hub{padding:26px 28px;margin:14px 0;max-width:none;display:block}
+body.va-app .vf-hub b{display:block;font:400 1.7rem/1.1 var(--font-head);margin-bottom:6px}
+body.va-app .vf-hub .vf-saved{margin:0 0 18px;color:rgba(244,246,248,.72)}
+body.va-app .vf-hub .btn+.btn{margin-left:8px}
+body.va-app .bp-cards{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+body.va-app .bp-card{padding:20px 22px}
+body.va-app .bp-card b{font:400 2rem/1.1 var(--font-head)}
+body.va-app .vf-grid{gap:16px}
+body.va-app .vf-pill,body.va-app .st{border-radius:0;letter-spacing:.16em}
+body.va-app .vf-bar,body.va-app .vf-bar i,body.va-app .pp-card .pp-bar,body.va-app .pp-card .pp-bar i{border-radius:0}
+body.va-app .vf-bar i,body.va-app .pp-card .pp-bar i{background:#C9A86A}
+
+/* forms */
+body.va-app input,body.va-app select,body.va-app textarea,body.va-app .fld input,body.va-app .bp-form input,body.va-app .bp-form select{border-radius:0;background:rgba(10,18,36,.7);border:1px solid rgba(192,192,192,.32);color:#F4F6F8}
+body.va-app input:focus,body.va-app select:focus,body.va-app textarea:focus{outline:none;border-color:#C9A86A}
+body.va-app label{letter-spacing:.2em}
+
+/* tables */
+body.va-app .al-table{overflow-x:auto}
+body.va-app .al-table th{letter-spacing:.2em;color:#C9A86A;font-weight:500}
+body.va-app .al-table tr+tr td{border-top:1px solid rgba(192,192,192,.14)}
+body.va-app .al-banner{border-radius:0}
+body.va-app .pp-card .st{display:inline-block;padding:4px 10px;border-radius:0}
+body.va-app a.bp-card{display:block;color:inherit;text-decoration:none;transition:border-color .25s,background .25s}
+body.va-app a.bp-card:hover,body.va-app a.bp-card:focus-visible{border-color:#C9A86A;background:rgba(201,168,106,.06)}
+body.va-app a.bp-card small{margin-bottom:8px}
+body.va-app a.bp-card span{display:block;color:rgba(244,246,248,.72);font-size:.9rem;line-height:1.5}
