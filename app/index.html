@@ -887,396 +887,9 @@ window.API=(function(){
 <section class="bp" id="billadmin" role="dialog" aria-label="Billing admin"><div class="bp-in"><button class="btn small" type="button" data-bpx style="position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,env(safe-area-inset-right,0px));z-index:2">Close</button><div id="ba-body"></div></div></section>
 <div class="pay-ov" id="pay-ov" role="dialog" aria-modal="true" aria-label="Demo checkout"><div class="pay-box" id="pay-box"></div></div>
 
-<script>
-/* ===== MILESTONE 3: billing portal and simulated checkout ===== */
-(function(){
-  CONFIG.payments={mode:'demo',provider:'Bank transfer',currency:'USD'};   /* mirrors PAYMENTS_MODE in the backend .env */
-  var KEY='vintage_billing_demo_v1',ME='c1';
-  function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
-  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-  function day(n){var d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d.toISOString()}
-  function fmt(d){return d?new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'-'}
-  var mem=null;
-  function seed(){return{n:4,e:3,clients:[{id:'c1',name:'You (demo client)',email:'client@example.com'},{id:'c2',name:'Harbour & Hearth',email:'owner@harbour.example'},{id:'c3',name:'Northfield Fitness',email:'hello@northfield.example'}],
-    invoices:[
-      {id:'INV-0001',client:'c1',desc:'Website Growth, 50% deposit',amount:300,status:'paid',due:day(-20),paidAt:day(-19),method:'bank'},
-      {id:'INV-0002',client:'c1',desc:'Website Growth, final payment',amount:300,status:'unpaid',due:day(7)},
-      {id:'INV-0003',client:'c2',desc:'Marketing Growth, month 1',amount:275,status:'paid',due:day(-30),paidAt:day(-30),method:'manual'},
-      {id:'INV-0004',client:'c3',desc:'AI Chatbots Starter',amount:200,status:'unpaid',due:day(-4)}],
-    subs:[{id:'S-1',client:'c1',plan:'Marketing Growth',amount:275,status:'active',next:day(12)},{id:'S-2',client:'c2',plan:'Marketing Growth',amount:275,status:'active',next:day(2)},{id:'S-3',client:'c3',plan:'Marketing Essential',amount:150,status:'overdue',next:day(-4)}],
-    payments:[{id:'PAY-1',invoice:'INV-0001',amount:300,method:'bank',status:'succeeded',at:day(-19)},{id:'PAY-2',invoice:'INV-0003',amount:275,method:'manual',status:'succeeded',at:day(-30)}],
-    events:[{id:'evt_seed1',type:'payment.succeeded',invoice:'INV-0001',at:day(-19),result:'processed'}]}}
-  function load(){if(mem)return mem;try{mem=JSON.parse(ls(KEY)||'null')}catch(e){mem=null}if(!mem)mem=seed();return mem}
-  function save(){ls(KEY,JSON.stringify(mem))}
-  function toast(t){var d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},3500)}
-  function cname(id){var c=load().clients.filter(function(x){return x.id===id})[0];return c?c.name:id}
-  function nid(prefix,k){var s=load();s[k]=(s[k]||0)+1;return prefix+String(s[k]).padStart(4,'0')}
-  function inv(id){return load().invoices.filter(function(i){return i.id===id})[0]}
-  function overdue(i){return i.status==='unpaid'&&new Date(i.due)<new Date()}
-  function istat(i){return overdue(i)?'overdue':i.status}
-
-  /* webhook handler: verified event -> idempotent state change -> log (mirrors server/src/webhook.ts) */
-  function deliver(ev){
-    var s=load();
-    if(s.events.some(function(e){return e.id===ev.id&&e.result==='processed'})){s.events.unshift({id:ev.id,type:ev.type,invoice:ev.invoice,at:new Date().toISOString(),result:'duplicate ignored'});save();return 'duplicate'}
-    var i=inv(ev.invoice);if(!i){s.events.unshift({id:ev.id,type:ev.type,invoice:ev.invoice,at:new Date().toISOString(),result:'unknown invoice'});save();return 'unknown'}
-    var pid=nid('PAY-','n');
-    if(ev.type==='payment.succeeded'&&i.status!=='paid'){i.status='paid';i.paidAt=new Date().toISOString();i.method='bank';s.payments.unshift({id:pid,invoice:i.id,amount:i.amount,method:'bank',status:'succeeded',at:i.paidAt});
-      s.subs.forEach(function(x){if(x.client===i.client&&x.status!=='cancelled'&&(x.status==='overdue'||x.status==='due')){x.status='active'}})}
-    else if(ev.type==='payment.failed'||ev.type==='payment.cancelled'){s.payments.unshift({id:pid,invoice:i.id,amount:i.amount,method:'bank',status:ev.type==='payment.failed'?'failed':'cancelled',at:new Date().toISOString()})}
-    s.events.unshift({id:ev.id,type:ev.type,invoice:ev.invoice,at:new Date().toISOString(),result:'processed'});save();return 'ok';
-  }
-  function newEvent(type,invoice){var s=load();return{id:'evt_'+(s.e++)+Math.random().toString(36).slice(2,6),type:type,invoice:invoice}}
-
-  /* simulated hosted checkout */
-  var ov=document.getElementById('pay-ov'),box=document.getElementById('pay-box');
-  function checkout(id,after){
-    var i=inv(id);if(!i||i.status==='paid')return;
-    box.innerHTML='<h4>Demo payment <small style="font-weight:400;color:#6b7385">(simulated)</small></h4><div>'+esc(i.desc)+'<br><small>'+esc(i.id)+'</small></div><div class="amt">'+CONFIG.currency+i.amount.toLocaleString('en-US')+'</div><div class="demo">Demo mode. No real card is used or charged. On the real site this step shows our bank details instead.</div><button class="ok" id="pb-ok">Simulate successful payment</button><button id="pb-fail">Simulate failed payment</button><button id="pb-cx">Cancel and go back</button>';
-    ov.classList.add('show');
-    function done(type,msg){ov.classList.remove('show');deliver(newEvent(type,id));toast(msg);if(after)after()}
-    document.getElementById('pb-ok').onclick=function(){done('payment.succeeded','Payment received. Receipt emailed (simulated).')};
-    document.getElementById('pb-fail').onclick=function(){done('payment.failed','Payment failed. Nothing was charged. You can try again.')};
-    document.getElementById('pb-cx').onclick=function(){done('payment.cancelled','Payment cancelled. Your invoice is still open.')};
-  }
-  /* documents */
-  function docHtml(i,kind){
-    var c=load().clients.filter(function(x){return x.id===i.client})[0]||{};
-    return '<!doctype html><meta charset="utf-8"><title>'+esc(kind)+' '+esc(i.id)+'</title><body style="font-family:Arial,sans-serif;max-width:640px;margin:40px auto;color:#1b2333"><h1 style="letter-spacing:.3em;font-weight:400">VINTAGE</h1><p style="margin-top:-12px;letter-spacing:.4em;font-size:11px">ADVERTISING</p><hr><h2>'+esc(kind)+' '+esc(i.id)+'</h2><p>Billed to: '+esc(c.name)+' ('+esc(c.email)+')</p><p>'+esc(i.desc)+'</p><p>Amount: <b>'+CONFIG.currency+i.amount.toLocaleString('en-US')+'</b> USD</p><p>Status: '+esc(istat(i))+(i.paidAt?' on '+fmt(i.paidAt):'')+'</p><p>Due: '+fmt(i.due)+'</p><hr><p style="font-size:12px;color:#666">Demo document. Placeholder business details. Contact: advertising.vintage1@gmail.com</p></body>';
-  }
-  async function download(i,kind){
-    var h=docHtml(i,kind),caps=window.__V;if(caps)await caps.capsReady;
-    if(caps&&caps.cap.downloads){try{await caps.cap.downloads.save({filename:kind.toLowerCase()+'-'+i.id+'.html',data:h});return}catch(e){}}
-    toast('Download is not available in this view.');
-  }
-
-  /* ---------- client portal ---------- */
-  var pv=document.getElementById('portalview'),pb=document.getElementById('bp-body');
-  function renderPortal(){
-    var s=load(),mine=s.invoices.filter(function(i){return i.client===ME}),subs=s.subs.filter(function(x){return x.client===ME}),active=subs.filter(function(x){return x.status!=='cancelled'});
-    var out=mine.filter(function(i){return i.status==='unpaid'}),owed=out.reduce(function(a,i){return a+i.amount},0);
-    var nxt=active.map(function(x){return x.next}).sort()[0];
-    var h='<div class="eyebrow">Client portal</div><h2>Your account</h2><p class="lead">Demo data stored in this browser. Real sign-up, email verification and password reset come with the backend.</p>';
-    h+='<div class="bp-cards"><div class="bp-card"><small>Active services</small><b>'+active.length+'</b></div><div class="bp-card"><small>Next billing</small><b>'+(nxt?fmt(nxt):'-')+'</b></div><div class="bp-card"><small>Outstanding</small><b>'+CONFIG.currency+owed.toLocaleString('en-US')+'</b></div></div>';
-    h+='<h3 class="sec">Services</h3><div class="al-table"><table><thead><tr><th>Service</th><th>Price</th><th>Status</th><th>Next billing</th><th></th></tr></thead><tbody>';
-    if(!subs.length)h+='<tr><td colspan="5">No services yet. Choose a package on the pricing section.</td></tr>';
-    subs.forEach(function(x){h+='<tr><td><strong>'+esc(x.plan)+'</strong></td><td>'+CONFIG.currency+x.amount+' / month</td><td><span class="st '+x.status+'">'+x.status+'</span></td><td>'+(x.status==='cancelled'?'-':fmt(x.next))+'</td><td><div class="bp-act">'+(x.status==='cancelled'?'':'<select data-chg="'+x.id+'" aria-label="Change plan">'+['Essential','Growth','Scale'].map(function(n){return '<option'+(x.plan==='Marketing '+n?' selected':'')+'>Marketing '+n+'</option>'}).join('')+'</select><button class="btn mini" data-cx="'+x.id+'" type="button">Cancel</button>')+'</div></td></tr>'});
-    h+='</tbody></table></div><h3 class="sec">Invoices</h3><div class="al-table"><table><thead><tr><th>Invoice</th><th>Description</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>';
-    mine.forEach(function(i){h+='<tr><td><strong>'+esc(i.id)+'</strong></td><td>'+esc(i.desc)+'</td><td>'+CONFIG.currency+i.amount.toLocaleString('en-US')+'</td><td>'+fmt(i.due)+'</td><td><span class="st '+istat(i)+'">'+istat(i)+'</span></td><td><div class="bp-act">'+(i.status==='unpaid'?'<button class="btn gold mini" data-pay="'+i.id+'" type="button">Pay now</button><button class="btn mini" data-link="'+i.id+'" type="button">Copy link</button>':'')+'<button class="btn mini" data-dl="'+i.id+'" type="button">'+(i.status==='paid'?'Receipt':'Invoice')+'</button></div></td></tr>'});
-    h+='</tbody></table></div><h3 class="sec">Payment history</h3><div class="al-table"><table><thead><tr><th>Date</th><th>Invoice</th><th>Amount</th><th>Method</th><th>Result</th></tr></thead><tbody>';
-    var ph=s.payments.filter(function(p){var i=inv(p.invoice);return i&&i.client===ME});
-    if(!ph.length)h+='<tr><td colspan="5">No payments yet.</td></tr>';
-    ph.forEach(function(p){h+='<tr><td>'+fmt(p.at)+'</td><td>'+esc(p.invoice)+'</td><td>'+CONFIG.currency+p.amount+'</td><td>'+esc(p.method)+'</td><td><span class="st '+p.status+'">'+p.status+'</span></td></tr>'});
-    h+='</tbody></table></div>';pb.innerHTML=h;
-    pb.querySelectorAll('[data-pay]').forEach(function(b){b.onclick=function(){checkout(b.dataset.pay,renderPortal)}});
-    pb.querySelectorAll('[data-dl]').forEach(function(b){b.onclick=function(){var i=inv(b.dataset.dl);download(i,i.status==='paid'?'Receipt':'Invoice')}});
-    pb.querySelectorAll('[data-link]').forEach(function(b){b.onclick=function(){var u=location.href.split('#')[0]+'#pay-'+b.dataset.link;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){toast('Payment link copied')},function(){toast('Link: '+u)})}});
-    pb.querySelectorAll('[data-cx]').forEach(function(b){b.onclick=function(){if(b.dataset.armed){var x=load().subs.filter(function(y){return y.id===b.dataset.cx})[0];x.status='cancelled';save();toast('Service cancelled. It stays active until the period ends.');renderPortal()}else{b.dataset.armed=1;b.textContent='Confirm cancel'}}});
-    pb.querySelectorAll('[data-chg]').forEach(function(sel){sel.onchange=function(){var x=load().subs.filter(function(y){return y.id===sel.dataset.chg})[0];var p=CONFIG.pricing.marketing.plans.filter(function(q){return 'Marketing '+q.name===sel.value})[0];x.plan=sel.value;if(p)x.amount=p.month;save();toast('Plan changed. New price applies next billing.');renderPortal()}});
-  }
-  function openPortal(payId){pv.classList.add('show');document.body.style.overflow='hidden';renderPortal();if(payId&&inv(payId)&&inv(payId).status==='unpaid'&&inv(payId).client===ME)checkout(payId,renderPortal)}
-  function closeAll(){pv.classList.remove('show');ba.classList.remove('show');document.body.style.overflow='';if(/^#(portal|admin-billing|pay-)/.test(location.hash))history.replaceState(null,'',location.pathname+location.search)}
-
-  /* ---------- billing admin ---------- */
-  var ba=document.getElementById('billadmin'),bab=document.getElementById('ba-body');
-  function renderAdmin(){
-    var s=load(),sum=function(f){return s.invoices.filter(f).reduce(function(a,i){return a+i.amount},0)};
-    var collected=sum(function(i){return i.status==='paid'}),outst=sum(function(i){return i.status==='unpaid'}),refunded=sum(function(i){return i.status==='refunded'});
-    var h='<div class="eyebrow">Admin</div><h2>Billing</h2><p class="lead">Demo data stored in this browser. Mode: <strong>'+CONFIG.payments.mode+'</strong> (set PAYMENTS_MODE to live on the backend).</p>';
-    h+='<div class="bp-cards"><div class="bp-card"><small>Collected</small><b>'+CONFIG.currency+collected.toLocaleString('en-US')+'</b></div><div class="bp-card"><small>Outstanding</small><b>'+CONFIG.currency+outst.toLocaleString('en-US')+'</b></div><div class="bp-card"><small>Refunded</small><b>'+CONFIG.currency+refunded.toLocaleString('en-US')+'</b></div><div class="bp-card"><small>Active services</small><b>'+s.subs.filter(function(x){return x.status!=='cancelled'}).length+'</b></div></div>';
-    h+='<h3 class="sec">Create invoice</h3><form class="bp-form" id="ba-form"><div><label for="ba-c">Client</label><select id="ba-c">'+s.clients.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join('')+'</select></div><div><label for="ba-d">Description</label><input id="ba-d" required maxlength="80" placeholder="e.g. Logo refresh"></div><div><label for="ba-a">Amount (USD)</label><input id="ba-a" type="number" min="1" step="1" required></div><div><label for="ba-due">Due in days</label><input id="ba-due" type="number" min="0" value="7"></div><div><button class="btn gold small" type="submit">Create and send</button></div></form>';
-    h+='<h3 class="sec">Invoices</h3><div class="al-bar"><span class="grow">'+s.invoices.length+' invoices</span><button class="btn small" id="ba-csv" type="button">Export CSV</button></div><div class="al-table"><table><thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-    s.invoices.forEach(function(i){h+='<tr><td><strong>'+esc(i.id)+'</strong><br><small>'+esc(i.desc)+'</small></td><td>'+esc(cname(i.client))+'</td><td>'+CONFIG.currency+i.amount.toLocaleString('en-US')+'</td><td>'+fmt(i.due)+'</td><td><span class="st '+istat(i)+'">'+istat(i)+'</span></td><td><div class="bp-act">'+(i.status==='unpaid'?'<button class="btn mini" data-mp="'+i.id+'" type="button">Mark paid (bank/cash)</button>':'')+(i.status==='paid'?'<button class="btn mini" data-rf="'+i.id+'" type="button">Refund</button>':'')+'</div></td></tr>'});
-    h+='</tbody></table></div><h3 class="sec">Webhook log</h3><div class="al-bar"><span class="grow">Every event received, including duplicates. Replay the latest to test that no payment is recorded twice.</span><button class="btn small" id="ba-replay" type="button">Replay last event</button></div><div class="al-table"><table><thead><tr><th>Time</th><th>Event id</th><th>Type</th><th>Invoice</th><th>Result</th></tr></thead><tbody>';
-    s.events.slice(0,12).forEach(function(e){h+='<tr><td>'+fmt(e.at)+'</td><td>'+esc(e.id)+'</td><td>'+esc(e.type)+'</td><td>'+esc(e.invoice)+'</td><td>'+esc(e.result)+'</td></tr>'});
-    h+='</tbody></table></div>';bab.innerHTML=h;
-    document.getElementById('ba-form').onsubmit=function(e){e.preventDefault();var a=Math.round(+document.getElementById('ba-a').value),d=document.getElementById('ba-d').value.trim();if(!(a>0)||!d)return;
-      var s2=load();s2.invoices.unshift({id:nid('INV-','n'),client:document.getElementById('ba-c').value,desc:d,amount:a,status:'unpaid',due:day(+document.getElementById('ba-due').value||0)});save();toast('Invoice created. Email sent (simulated).');renderAdmin()};
-    bab.querySelectorAll('[data-mp]').forEach(function(b){b.onclick=function(){var i=inv(b.dataset.mp);i.status='paid';i.paidAt=new Date().toISOString();i.method='manual';load().payments.unshift({id:nid('PAY-','n'),invoice:i.id,amount:i.amount,method:'manual',status:'succeeded',at:i.paidAt});save();toast('Marked paid manually.');renderAdmin()}});
-    bab.querySelectorAll('[data-rf]').forEach(function(b){b.onclick=function(){if(!b.dataset.armed){b.dataset.armed=1;b.textContent='Confirm refund';return}var i=inv(b.dataset.rf);i.status='refunded';load().payments.unshift({id:nid('PAY-','n'),invoice:i.id,amount:i.amount,method:i.method||'manual',status:'refunded',at:new Date().toISOString()});save();toast('Refund recorded.');renderAdmin()}});
-    document.getElementById('ba-replay').onclick=function(){var last=load().events.filter(function(e){return e.result==='processed'})[0];if(!last){toast('No event to replay.');return}var r=deliver({id:last.id,type:last.type,invoice:last.invoice});toast(r==='duplicate'?'Replay ignored: no second payment recorded.':'Replay processed.');renderAdmin()};
-    document.getElementById('ba-csv').onclick=async function(){
-      var head=['id','client','description','amount','status','due','paidAt','method'];
-      var csv=[head.join(',')].concat(load().invoices.map(function(i){return head.map(function(k){var v=k==='client'?cname(i.client):i[k];v=String(v==null?'':v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')})).join('\n');
-      var caps=window.__V;if(caps)await caps.capsReady;if(caps&&caps.cap.downloads){try{await caps.cap.downloads.save({filename:'vintage-invoices.csv',data:csv});return}catch(e){}}
-      try{await navigator.clipboard.writeText(csv);toast('CSV copied to clipboard')}catch(e){toast('Export is not available in this view.')}};
-  }
-  async function openAdmin(){
-    ba.classList.add('show');document.body.style.overflow='hidden';bab.innerHTML='<p class="lead">Loading…</p>';
-    var caps=window.__V;if(caps)await caps.capsReady;
-    if(!caps||!caps.cap.owner){bab.innerHTML='<div class="al-banner">This page is for the site owner. Sign in to claude.ai with the owner account to open it.</div>';return}
-    renderAdmin();
-  }
-  /* checkout from the pricing dialog creates an order and invoice */
-  var co=document.getElementById('m-co');
-  if(co&&!API.on)co.addEventListener('click',function(){
-    var plan=document.getElementById('m-plan').textContent,pr=document.getElementById('m-price').textContent,m=pr.match(/\$([\d,]+)/);if(!m)return;
-    var amt=+m[1].replace(/,/g,''),rec=/month/i.test(pr),s=load(),id=nid('INV-','n');
-    s.invoices.unshift({id:id,client:ME,desc:plan+(rec?', first month':', full payment'),amount:amt,status:'unpaid',due:day(7)});
-    if(rec)s.subs.unshift({id:'S-'+(s.n),client:ME,plan:plan,amount:amt,status:'due',next:day(30)});
-    save();document.getElementById('m-close').click();openPortal();checkout(id,renderPortal);
-  });
-  $$('[data-bpx]').forEach(function(b){b.addEventListener('click',closeAll)});
-  function route(){var h=location.hash;if(h==='#portal')openPortal();else if(/^#pay-INV-\d+$/.test(h))openPortal(h.slice(5));else if(h==='#admin-billing')openAdmin();else if(pv.classList.contains('show')||ba.classList.contains('show')){pv.classList.remove('show');ba.classList.remove('show');if(!/^#(terms|privacy|refunds|admin-leads)$/.test(h))document.body.style.overflow=''}}
-  if(!API.on){addEventListener('hashchange',route);route()}
-})();
-</script>
 
 <section class="bp" id="booksview" role="dialog" aria-label="Vintage Books"><div class="bp-in"><button class="btn small" type="button" id="bk-x" style="position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,env(safe-area-inset-right,0px));z-index:2">Close</button><div id="bk-body"></div></div></section>
 
-<script>
-/* ===== MILESTONE 4: Vintage Books (admin only, demo data in this browser) ===== */
-(function(){
-  var KEY='vintage_books_v1',BILL='vintage_billing_demo_v1';
-  function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
-  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-  function money(c){var n=Math.abs(c)/100,s=n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return (c<0?'-':'')+CONFIG.currency+s}
-  function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-  function dAgo(n){var d=new Date();d.setDate(d.getDate()-n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-  function toast(t){var d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},3500)}
-  var CASH=['1000','1010','1020'];
-  function seed(){
-    var S={n:0,a:0,accounts:[['1000','Bank','asset'],['1020','Cash','asset'],['1100','Accounts Receivable','asset'],['2000','Tax payable','liability'],['2100','Deferred revenue','liability'],['3000','Owner equity','equity'],['4000','Revenue: Websites','revenue'],['4010','Revenue: Marketing','revenue'],['4020','Revenue: AI Chatbots','revenue'],['4999','Uncategorised income','revenue'],['5000','Ad spend','expense'],['5010','Software','expense'],['5020','Hosting','expense'],['5030','Salaries','expense'],['5040','Rent','expense'],['5050','Transport','expense'],['5060','Fees','expense'],['5999','Uncategorised expense','expense']].map(function(a){return {code:a[0],name:a[1],type:a[2]}}),
-      rules:[{kw:'meta',acct:'5000'},{kw:'facebook',acct:'5000'},{kw:'canva',acct:'5010'},{kw:'google workspace',acct:'5010'},{kw:'domain',acct:'5020'},{kw:'hosting',acct:'5020'},{kw:'vercel',acct:'5020'},{kw:'fuel',acct:'5050'},{kw:'bank fee',acct:'5060'}],
-      entries:[],audit:[],settings:{large:50000,vatOn:false,vat:15}};
-    mem=S;
-    post({date:dAgo(40),memo:'Opening balance (demo)',source:'manual',lines:[{a:'1000',dr:50000},{a:'3000',cr:50000}]},'approved');
-    post({date:dAgo(25),memo:'Canva Pro',source:'manual',lines:[{a:'5010',dr:1500},{a:'1000',cr:1500}]},'approved');
-    post({date:dAgo(18),memo:'Meta Ads campaign',source:'manual',lines:[{a:'5000',dr:12000},{a:'1010',cr:12000}]},'approved');
-    post({date:dAgo(9),memo:'Web hosting',source:'manual',lines:[{a:'5020',dr:2000},{a:'1000',cr:2000}]},'approved');
-    post({date:dAgo(2),memo:'Fuel for client visit',source:'ai-chat',lines:[{a:'5050',dr:3000},{a:'1020',cr:3000}]},'suggested');
-    return S;
-  }
-  var mem=null;
-  function load(){if(mem)return mem;try{mem=JSON.parse(ls(KEY)||'null')}catch(e){mem=null}if(!mem){seed();save()}return mem}
-  function save(){ls(KEY,JSON.stringify(mem))}
-  function log(action,before,after){mem.audit.unshift({at:new Date().toISOString(),user:'owner',action:action,before:before||null,after:after||null})}
-  function acct(code){return load().accounts.filter(function(a){return a.code===code})[0]}
-  function aname(code){var a=acct(code);return a?code+' '+a.name:code}
-
-  /* posting: append-only, must balance (all arithmetic here, in code) */
-  function post(e,status){
-    var dr=0,cr=0;e.lines.forEach(function(l){dr+=l.dr||0;cr+=l.cr||0});
-    if(dr!==cr||dr<=0)throw new Error('Entry does not balance');
-    var S=mem;S.n++;var rec={id:'JE-'+String(S.n).padStart(4,'0'),date:e.date,memo:e.memo,source:e.source||'manual',srcKey:e.srcKey||null,status:status||'suggested',currency:'USD',rate:1,lines:e.lines,reverses:e.reverses||null,invoice:e.invoice||null,sig:(e.date+'|'+dr+'|'+String(e.memo).toLowerCase())};
-    S.entries.push(rec);log('create '+rec.id,null,{status:rec.status,memo:rec.memo,amount:dr});return rec;
-  }
-  function live(){var S=load();return S.entries.filter(function(e){return e.status==='approved'})}
-  function inRange(e,f,t){return (!f||e.date>=f)&&(!t||e.date<=t)}
-  function bal(code,f,t){var d=0,c=0;live().forEach(function(e){if(!inRange(e,f,t))return;e.lines.forEach(function(l){if(l.a===code){d+=l.dr||0;c+=l.cr||0}})});return {dr:d,cr:c}}
-  function net(a,f,t){var b=bal(a.code,f,t);return a.type==='asset'||a.type==='expense'?b.dr-b.cr:b.cr-b.dr}
-  function report(f,t){
-    var A=load().accounts,rev=[],exp=[],ast=[],lia=[],eq=[];
-    A.forEach(function(a){var v=net(a,f,t);if(!v&&a.type!=='asset')return;var r={code:a.code,name:a.name,v:v};if(a.type==='revenue')rev.push(r);else if(a.type==='expense')exp.push(r);else if(a.type==='asset')ast.push(r);else if(a.type==='liability')lia.push(r);else eq.push(r)});
-    var sum=function(x){return x.reduce(function(s,y){return s+y.v},0)};
-    var R=sum(rev),E=sum(exp),profit=R-E;
-    var cin=0,cout=0;live().forEach(function(e){if(!inRange(e,f,t))return;e.lines.forEach(function(l){if(CASH.indexOf(l.a)>-1){cin+=l.dr||0;cout+=l.cr||0}})});
-    /* balance sheet is as at the end date, from the beginning of time */
-    var bsA=[],bsL=[],bsE=[];A.forEach(function(a){var v=net(a,null,t);if(a.type==='asset')bsA.push({code:a.code,name:a.name,v:v});else if(a.type==='liability')bsL.push({code:a.code,name:a.name,v:v});else if(a.type==='equity')bsE.push({code:a.code,name:a.name,v:v})});
-    var earn=0;A.forEach(function(a){var v=net(a,null,t);if(a.type==='revenue')earn+=v;if(a.type==='expense')earn-=v});
-    return {revenue:rev,expenses:exp,totalRevenue:R,totalExpenses:E,profit:profit,cashIn:cin,cashOut:cout,cashNet:cin-cout,cashPosition:sum(ast.filter(function(x){return CASH.indexOf(x.code)>-1})),bs:{assets:bsA,liabilities:bsL,equity:bsE,earnings:earn,totalAssets:sum(bsA),totalLiabLE:sum(bsL)+sum(bsE)+earn}};
-  }
-  function bill(){try{return JSON.parse(ls(BILL)||'null')}catch(e){return null}}
-  function svcAcct(desc){return /website/i.test(desc)?'4000':/market/i.test(desc)?'4010':/chat|ai/i.test(desc)?'4020':'4999'}
-  function has(key){return load().entries.some(function(e){return e.srcKey===key})}
-
-  /* sync confirmed billing events into the ledger (idempotent by srcKey) */
-  function sync(){
-    var b=bill();if(!b){return 0}var n=0;
-    b.invoices.forEach(function(i){
-      var amt=Math.round(i.amount*100),date=(i.paidAt||i.due||new Date().toISOString()).slice(0,10),rev=svcAcct(i.desc);
-      if(!has('inv-issued:'+i.id)){post({date:(i.due||date).slice(0,10),memo:'Invoice '+i.id+' issued',source:'billing',srcKey:'inv-issued:'+i.id,invoice:i.id,lines:[{a:'1100',dr:amt},{a:rev,cr:amt}]},'approved');n++}
-      if((i.status==='paid'||i.status==='refunded')&&!has('inv-paid:'+i.id)){post({date:date,memo:'Payment for '+i.id+' ('+(i.method||'')+')',source:'billing',srcKey:'inv-paid:'+i.id,invoice:i.id,lines:[{a:'1000',dr:amt},{a:'1100',cr:amt}]},'approved');n++}
-      if(i.status==='refunded'&&!has('inv-refund:'+i.id)){post({date:today(),memo:'Refund for '+i.id,source:'billing',srcKey:'inv-refund:'+i.id,invoice:i.id,lines:[{a:rev,dr:amt},{a:'1000',cr:amt}]},'approved');n++}
-    });
-    if(n){save()}return n;
-  }
-  function reverse(id){
-    var S=load(),e=S.entries.filter(function(x){return x.id===id})[0];if(!e||e.status!=='approved'||e.reverses)return;
-    if(S.entries.some(function(x){return x.reverses===id}))return;
-    var r=post({date:today(),memo:'Reversal of '+e.id+': '+e.memo,source:'reversal',reverses:e.id,lines:e.lines.map(function(l){return {a:l.a,dr:l.cr||0,cr:l.dr||0}})},'approved');save();return r;
-  }
-  function suggestAcct(text,fallback){var t=String(text).toLowerCase(),r=load().rules.filter(function(x){return t.indexOf(x.kw.toLowerCase())>-1})[0];return r&&acct(r.acct)?r.acct:fallback}
-  function expenseEntry(o){ /* o: date, memo, cents, acct, from, source */
-    var ac=o.acct||suggestAcct(o.memo,'5999');
-    return post({date:o.date,memo:o.memo,source:o.source||'manual',lines:[{a:ac,dr:o.cents},{a:o.from||'1000',cr:o.cents}]},'suggested');
-  }
-  function incomeEntry(o){
-    var S=load(),vat=0;if(S.settings.vatOn&&o.vat)vat=Math.round(o.cents*S.settings.vat/(100+S.settings.vat));
-    var lines=[{a:o.to||'1000',dr:o.cents},{a:o.acct||'4999',cr:o.cents-vat}];if(vat)lines.push({a:'2000',cr:vat});
-    return post({date:o.date,memo:o.memo,source:o.source||'manual',lines:lines},'suggested');
-  }
-  function entryAmount(e){return e.lines.reduce(function(s,l){return s+(l.dr||0)},0)}
-
-  /* flags */
-  function flags(){
-    var S=load(),out=[],seen={};
-    S.entries.filter(function(e){return e.status!=='rejected'&&!e.reverses}).forEach(function(e){if(seen[e.sig])out.push({t:'Possible duplicate: '+e.memo+' on '+e.date+' ('+money(entryAmount(e))+')',ids:[seen[e.sig],e.id]});else seen[e.sig]=e.id});
-    S.entries.forEach(function(e){if(e.status==='rejected'||e.reverses)return;var a=entryAmount(e);if(a>=S.settings.large&&e.source!=='billing'&&e.memo.indexOf('Opening')!==0)out.push({t:'Unusually large amount: '+e.id+' '+e.memo+' ('+money(a)+')'});
-      if(e.lines.some(function(l){return l.a==='5999'||l.a==='4999'}))out.push({t:'Uncategorised: '+e.id+' '+e.memo+' ('+money(a)+')',fix:e.id})});
-    var b=bill();if(b)b.invoices.forEach(function(i){if(i.status==='paid'&&!has('inv-paid:'+i.id))out.push({t:'Paid but not recorded in the books: '+i.id+' ('+money(Math.round(i.amount*100))+')',sync:1})});
-    return out;
-  }
-
-  /* ---------- AI helpers (AI drafts and explains; code does all arithmetic) ---------- */
-  async function sampler(){var c=window.__V;if(c)await c.capsReady;return c&&c.cap.sample}
-  function parseLocal(t){
-    var m=t.match(/(?:\$|usd\s*)?\s?(\d+(?:[.,]\d{1,2})?)/i);if(!m)return null;
-    var cents=Math.round(parseFloat(m[1].replace(',','.'))*100),date=/yesterday/i.test(t)?dAgo(1):today();
-    var sup=(t.match(/\bfor\s+(.+?)(?:\s+(?:today|yesterday)|$)/i)||[])[1]||t;
-    return {kind:/\b(received|got paid|income|from client)\b/i.test(t)?'income':'expense',cents:cents,date:date,memo:sup.trim().slice(0,80)};
-  }
-  async function aiParse(text){
-    var s=await sampler();if(s){
-      try{
-        var j=await s.json('Extract ONE bookkeeping transaction from the text. Copy the amount exactly as written; do not calculate anything. Today is '+today()+'. Return JSON only: {"kind":"expense"|"income","amount":number|null,"currency":string|null,"date":"YYYY-MM-DD"|null,"supplier_or_payer":string|null,"memo":string}. Text: '+JSON.stringify(text),{cache:false,modelTier:'quick'});
-        if(j&&typeof j.amount==='number'&&j.amount>0&&j.amount<1e7)return {kind:j.kind==='income'?'income':'expense',cents:Math.round(j.amount*100),date:/^\d{4}-\d{2}-\d{2}$/.test(j.date||'')?j.date:today(),memo:String(j.memo||j.supplier_or_payer||text).slice(0,80)};
-      }catch(e){}
-    }
-    return parseLocal(text);
-  }
-  function snapshot(f,t){
-    var r=report(f,t),S=load();
-    return {period:{from:f||'start',to:t||'today'},currency:'USD',totals:{revenue:money(r.totalRevenue),expenses:money(r.totalExpenses),profit:money(r.profit),cashIn:money(r.cashIn),cashOut:money(r.cashOut),cashPosition:money(r.cashPosition)},revenueByService:r.revenue.map(function(x){return [x.name,money(x.v)]}),expensesByCategory:r.expenses.map(function(x){return [x.name,money(x.v)]}).filter(function(x){return x[1]!==money(0)}),unapprovedDrafts:S.entries.filter(function(e){return e.status==='suggested'}).length,flags:flags().length};
-  }
-  function unverified(text,snap){
-    var allowed=JSON.stringify(snap).replace(/[^0-9.]/g,' ').split(/\s+/).filter(Boolean).map(function(x){return parseFloat(x)});
-    var nums=(text.replace(/,/g,'').match(/\d+(?:\.\d+)?/g)||[]).map(parseFloat).filter(function(n){return n>31||n%1});
-    return nums.filter(function(n){return allowed.indexOf(n)<0}).length>0;
-  }
-
-  /* ---------- UI ---------- */
-  var view=document.getElementById('booksview'),body=document.getElementById('bk-body'),tab='dash',range={f:'',t:''};
-  var TABS=[['dash','Dashboard'],['review','Review'],['ledger','Ledger'],['add','Add'],['reports','Reports'],['ask','Ask the books'],['settings','Settings']];
-  function acctOpts(types,sel){return load().accounts.filter(function(a){return types.indexOf(a.type)>-1}).map(function(a){return '<option value="'+a.code+'"'+(a.code===sel?' selected':'')+'>'+esc(a.code+' '+a.name)+'</option>'}).join('')}
-  function table(head,rows,cls){return '<div class="al-table"><table><thead><tr>'+head.map(function(h){return '<th'+(h[0]==='#'?' class="num"':'')+'>'+esc(h.replace(/^#/,''))+'</th>'}).join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'}
-  function render(){
-    var h='<div class="eyebrow">Admin</div><h2>Vintage Books</h2><p class="lead">A bookkeeping aid, not a substitute for a qualified accountant. The AI only suggests and explains. Every total is calculated by code. Demo data is stored in this browser.</p><div class="bk-tabs" role="tablist">'+TABS.map(function(t){return '<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</div><div id="bk-pane"></div>';
-    body.innerHTML=h;body.querySelectorAll('[data-tab]').forEach(function(b){b.onclick=function(){tab=b.dataset.tab;render()}});
-    ({dash:pDash,review:pReview,ledger:pLedger,add:pAdd,reports:pReports,ask:pAsk,settings:pSettings})[tab](document.getElementById('bk-pane'));
-  }
-  function bars(items,max){return '<div class="bk-bars">'+items.map(function(x){var w=max>0?Math.max(2,Math.round(x[1]/max*100)):0;return '<div class="bk-bar"><span>'+esc(x[0])+'</span><div class="track"><i style="width:'+w+'%"></i></div><b>'+money(x[1])+'</b></div>'}).join('')+'</div>'}
-  function pDash(p){
-    var r=report('',''),b=bill(),unpaid=b?b.invoices.filter(function(i){return i.status==='unpaid'}).reduce(function(s,i){return s+Math.round(i.amount*100)},0):0;
-    var top=r.expenses.filter(function(x){return x.v>0}).sort(function(a,b){return b.v-a.v}).slice(0,5).map(function(x){return [x.name,x.v]});
-    var h='<div class="bp-cards"><div class="bp-card"><small>Money in</small><b>'+money(r.cashIn)+'</b></div><div class="bp-card"><small>Money out</small><b>'+money(r.cashOut)+'</b></div><div class="bp-card"><small>Profit</small><b>'+money(r.profit)+'</b></div><div class="bp-card"><small>Cash position</small><b>'+money(r.cashPosition)+'</b></div><div class="bp-card"><small>Unpaid invoices</small><b>'+money(unpaid)+'</b></div></div>';
-    h+='<div class="bk-grid"><div><h3 class="sec" style="margin-top:20px">Money in and out</h3>'+bars([['In',r.cashIn],['Out',r.cashOut],['Profit',Math.max(0,r.profit)]],Math.max(r.cashIn,r.cashOut,1))+'</div><div><h3 class="sec" style="margin-top:20px">Top expenses</h3>'+(top.length?bars(top,top[0][1]):'<p class="lead">No expenses yet.</p>')+'</div></div>';
-    h+='<h3 class="sec">Month-end summary</h3><div class="bk-chat"><div class="out" id="bk-sum">Press the button to write a short summary from the calculated figures.</div><div class="bk-row"><button class="btn small" id="bk-sumgo" type="button">Write summary</button><button class="btn small" id="bk-sync" type="button">Sync from billing</button></div></div><p class="bk-note">Sync turns confirmed payments, manual payments and refunds from the billing portal into balanced ledger entries. Running it twice never duplicates them.</p>';
-    p.innerHTML=h;
-    document.getElementById('bk-sync').onclick=function(){var n=sync();toast(n?n+' ledger entries created from billing.':'Nothing new to sync.');render()};
-    document.getElementById('bk-sumgo').onclick=async function(){var o=document.getElementById('bk-sum'),snap=snapshot('','');o.textContent='Writing…';var s=await sampler(),txt='';
-      if(s){try{var r2=await s('Write a 4 sentence plain-English month-end summary for a small agency owner. Use ONLY the figures in this JSON, copied exactly. Do not add, subtract or estimate anything. Mention drafts awaiting approval if any.\n'+JSON.stringify(snap),{cache:false,modelTier:'quick'});txt=r2.text||''}catch(e){txt=''}}
-      if(!txt)txt='Revenue is '+snap.totals.revenue+' and expenses are '+snap.totals.expenses+', which leaves a profit of '+snap.totals.profit+'. Cash position is '+snap.totals.cashPosition+'. '+snap.unapprovedDrafts+' draft(s) await your approval.';
-      o.textContent=txt+(unverified(txt,snap)?'\n\nCheck: some numbers above could not be matched to the calculated figures.':'')};
-  }
-  function entryRow(e,actions){
-    var amt=entryAmount(e),lines=e.lines.map(function(l){return (l.dr?'Dr ':'Cr ')+esc(aname(l.a))+' '+money(l.dr||l.cr)}).join('<br>');
-    return '<tr class="'+(e.status==='suggested'?'bk-sug':'')+'"><td>'+esc(e.date)+'<br><small>'+esc(e.id)+'</small></td><td><strong>'+esc(e.memo)+'</strong><br><small>'+lines+'</small></td><td class="num">'+money(amt)+'</td><td><span class="st '+(e.status==='approved'?'paid':e.status==='suggested'?'unpaid':'void')+'">'+(e.status==='suggested'?'Suggested':e.status)+'</span><br><small>'+esc(e.source)+'</small></td><td><div class="bp-act">'+actions+'</div></td></tr>'}
-  function pReview(p){
-    var S=load(),sug=S.entries.filter(function(e){return e.status==='suggested'}),fl=flags();
-    var h='<h3 class="sec">Needs your attention</h3>';
-    h+=fl.length?fl.map(function(f,i){return '<div class="bk-flag"><span>'+esc(f.t)+'</span>'+(f.sync?'<button class="btn mini" data-fsync type="button">Sync from billing</button>':'')+'</div>'}).join(''):'<div class="bk-flag ok">No flags. Nothing looks unusual.</div>';
-    h+='<h3 class="sec">Suggested entries ('+sug.length+')</h3>';
-    h+=sug.length?table(['Date','Entry','#Amount','Status',''],sug.map(function(e){return entryRow(e,'<select data-cat="'+e.id+'" aria-label="Category">'+acctOpts(['expense','revenue'],e.lines.filter(function(l){return /^[45]/.test(l.a)})[0].a)+'</select><button class="btn gold mini" data-ap="'+e.id+'" type="button">Approve</button><button class="btn mini" data-rj="'+e.id+'" type="button">Reject</button>')})):'<p class="lead">All caught up.</p>';
-    if(sug.length>1)h+='<p style="margin-top:14px"><button class="btn small" id="bk-apall" type="button">Approve all</button></p>';
-    p.innerHTML=h;
-    p.querySelectorAll('[data-fsync]').forEach(function(b){b.onclick=function(){sync();render()}});
-    p.querySelectorAll('[data-cat]').forEach(function(s){s.onchange=function(){var e=load().entries.filter(function(x){return x.id===s.dataset.cat})[0],before=JSON.stringify(e.lines);e.lines.forEach(function(l){if(/^[45]/.test(l.a))l.a=s.value});log('recategorise '+e.id,before,JSON.stringify(e.lines));save();toast('Category changed. Still a draft.')}});
-    p.querySelectorAll('[data-ap]').forEach(function(b){b.onclick=function(){var e=load().entries.filter(function(x){return x.id===b.dataset.ap})[0];e.status='approved';log('approve '+e.id,'suggested','approved');save();render()}});
-    p.querySelectorAll('[data-rj]').forEach(function(b){b.onclick=function(){var e=load().entries.filter(function(x){return x.id===b.dataset.rj})[0];e.status='rejected';log('reject '+e.id,'suggested','rejected');save();render()}});
-    var all=document.getElementById('bk-apall');if(all)all.onclick=function(){load().entries.forEach(function(e){if(e.status==='suggested'){e.status='approved';log('approve '+e.id,'suggested','approved')}});save();render()};
-  }
-  function pLedger(p){
-    var S=load(),rows=S.entries.slice().reverse().map(function(e){var done=S.entries.some(function(x){return x.reverses===e.id});return entryRow(e,e.status==='approved'&&!e.reverses&&!done?'<button class="btn mini" data-rv="'+e.id+'" type="button">Reverse</button>':(done?'<small>Reversed</small>':''))});
-    var au=S.audit.slice(0,15).map(function(a){return '<tr><td>'+esc(a.at.slice(0,16).replace('T',' '))+'</td><td>'+esc(a.user)+'</td><td>'+esc(a.action)+'</td><td><small>'+esc(JSON.stringify(a.before))+' → '+esc(JSON.stringify(a.after))+'</small></td></tr>'});
-    p.innerHTML='<div class="al-bar"><span class="grow">The ledger is append-only. Fix a mistake with a reversing entry.</span><button class="btn small" id="bk-csv" type="button">Export CSV</button></div>'+table(['Date','Entry','#Amount','Status',''],rows)+'<h3 class="sec">Audit log</h3>'+table(['Time','User','Action','Before and after'],au);
-    p.querySelectorAll('[data-rv]').forEach(function(b){b.onclick=function(){if(!b.dataset.armed){b.dataset.armed=1;b.textContent='Confirm reverse';return}reverse(b.dataset.rv);toast('Reversing entry added.');render()}});
-    document.getElementById('bk-csv').onclick=function(){
-      var rowsCsv=[['id','date','memo','status','source','account','debit','credit','currency','rate']];
-      S.entries.forEach(function(e){e.lines.forEach(function(l){rowsCsv.push([e.id,e.date,e.memo,e.status,e.source,aname(l.a),((l.dr||0)/100).toFixed(2),((l.cr||0)/100).toFixed(2),e.currency,e.rate])})});
-      exportCsv(rowsCsv,'vintage-ledger.csv')};
-  }
-  async function exportCsv(rows,name){
-    var csv=rows.map(function(r){return r.map(function(v){v=String(v==null?'':v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')}).join('\n');
-    var c=window.__V;if(c)await c.capsReady;if(c&&c.cap.downloads){try{await c.cap.downloads.save({filename:name,data:csv});return}catch(e){}}
-    try{await navigator.clipboard.writeText(csv);toast('CSV copied to clipboard')}catch(e){toast('Export is not available in this view.')}
-  }
-  function pAdd(p){
-    var h='<div class="bk-grid"><div><h3 class="sec" style="margin-top:20px">Quick add by typing</h3><div class="bk-chat"><div class="bk-row"><input type="text" id="bk-q" placeholder="Paid $45 for Canva today" aria-label="Describe a transaction" maxlength="160"><button class="btn gold small" id="bk-qgo" type="button">Draft entry</button></div><div class="out" id="bk-qout">Creates a draft marked Suggested. Nothing counts until you approve it.</div></div>';
-    h+='<h3 class="sec">Receipt</h3><div class="bk-chat"><input type="file" id="bk-rc" accept="image/*" aria-label="Receipt photo"><div class="out" id="bk-rcout">Upload a photo of a receipt. The AI reads date, supplier and amount into a draft.</div></div></div>';
-    h+='<div><h3 class="sec" style="margin-top:20px">Manual entry</h3><form class="bp-form" id="bk-mf" style="grid-template-columns:1fr 1fr"><div><label for="mf-k">Type</label><select id="mf-k"><option value="expense">Expense</option><option value="income">Income</option></select></div><div><label for="mf-d">Date</label><input id="mf-d" type="date" value="'+today()+'" required></div><div style="grid-column:1/-1"><label for="mf-m">Description</label><input id="mf-m" required maxlength="80"></div><div><label for="mf-a">Amount (USD)</label><input id="mf-a" type="number" min="0.01" step="0.01" required></div><div><label for="mf-c">Category</label><select id="mf-c">'+acctOpts(['expense','revenue'],'5999')+'</select></div><div><label for="mf-f">Paid from / into</label><select id="mf-f">'+acctOpts(['asset'].concat([]),'1000').replace(/<option value="1100"[^>]*>[^<]*<\/option>/,'')+'</select></div>'+(load().settings.vatOn?'<div><label><input id="mf-v" type="checkbox" style="width:auto;min-height:0"> Includes VAT (income)</label></div>':'')+'<div style="grid-column:1/-1"><button class="btn gold small" type="submit">Add as draft</button></div></form>';
-    h+='<h3 class="sec">Bank statement CSV</h3><div class="bk-chat"><input type="file" id="bk-csvin" accept=".csv,text/csv" aria-label="Statement CSV"><div class="out" id="bk-csvout">Columns needed: date, description, amount (money in positive, out negative). Rows become drafts. Incoming amounts that match an invoice exactly are noted.</div></div></div></div>';
-    p.innerHTML=h;
-    document.getElementById('bk-qgo').onclick=async function(){var t=document.getElementById('bk-q').value.trim(),o=document.getElementById('bk-qout');if(!t)return;o.textContent='Reading…';var r=await aiParse(t);if(!r){o.textContent='I could not find an amount. Try: Paid $45 for Canva today.';return}
-      var e=r.kind==='income'?incomeEntry({date:r.date,memo:r.memo,cents:r.cents,source:'ai-chat'}):expenseEntry({date:r.date,memo:r.memo,cents:r.cents,source:'ai-chat'});save();o.textContent='Draft '+e.id+': '+r.memo+', '+money(r.cents)+' on '+r.date+' → '+aname(e.lines.filter(function(l){return /^[45]/.test(l.a)})[0].a)+'. Review it in the Review tab.'};
-    document.getElementById('bk-mf').onsubmit=function(ev){ev.preventDefault();var cents=Math.round(parseFloat(document.getElementById('mf-a').value)*100);if(!(cents>0))return;var k=document.getElementById('mf-k').value,vv=document.getElementById('mf-v');
-      var o={date:document.getElementById('mf-d').value,memo:document.getElementById('mf-m').value.trim(),cents:cents,acct:document.getElementById('mf-c').value,source:'manual'};
-      if(k==='income'){o.to=document.getElementById('mf-f').value;o.vat=vv&&vv.checked;incomeEntry(o)}else{o.from=document.getElementById('mf-f').value;expenseEntry(o)}save();toast('Draft added. Approve it in the Review tab.');render()};
-    document.getElementById('bk-rc').onchange=async function(ev){var f=ev.target.files[0],o=document.getElementById('bk-rcout');if(!f)return;
-      var s=await sampler();if(!s){o.textContent='Receipt reading is not available in this view. Use manual entry.';return}
-      try{var lim=s.limits?await s.limits():{images:false};if(!lim.images){o.textContent='Image reading is not enabled for this page. Use manual entry.';return}
-        o.textContent='Reading receipt…';var j=await s.json('Read this receipt. Copy values exactly as printed, do not calculate. Return JSON only: {"date":"YYYY-MM-DD"|null,"supplier":string|null,"total":number|null,"tax":number|null,"category_hint":string|null}',{images:[f],cache:false});
-        if(!j||!(j.total>0)){o.textContent='Could not read a total. Please enter it manually.';return}
-        var memo=(j.supplier||'Receipt')+(j.tax?' (tax '+j.tax+')':'');var e=expenseEntry({date:/^\d{4}-\d{2}-\d{2}$/.test(j.date||'')?j.date:today(),memo:memo,cents:Math.round(j.total*100),source:'receipt'});if(e.lines[0].a==='5999'&&j.category_hint){var g=suggestAcct(j.category_hint,'5999');e.lines[0].a=g}save();o.textContent='Draft '+e.id+': '+memo+', '+money(Math.round(j.total*100))+'. Check it in the Review tab.'}catch(e){o.textContent='Could not read that receipt. Please enter it manually.'}};
-    document.getElementById('bk-csvin').onchange=function(ev){var f=ev.target.files[0],o=document.getElementById('bk-csvout');if(!f)return;if(f.size>1e6){o.textContent='File too large.';return}
-      var fr=new FileReader();fr.onload=function(){var lines=String(fr.result).split(/\r?\n/).filter(Boolean),head=lines.shift().split(',').map(function(x){return x.trim().toLowerCase().replace(/"/g,'')}),di=head.indexOf('date'),mi=Math.max(head.indexOf('description'),head.indexOf('memo')),ai=head.indexOf('amount');
-        if(di<0||mi<0||ai<0){o.textContent='Could not find date, description and amount columns.';return}
-        var n=0,matched=0,b=bill();lines.slice(0,300).forEach(function(l){var c=l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(function(x){return x.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"')}),amt=Math.round(parseFloat(String(c[ai]).replace(/[^0-9.\-]/g,''))*100),d=String(c[di]).slice(0,10);if(!amt||!/^\d{4}-\d{2}-\d{2}$/.test(d))return;
-          var memo=String(c[mi]).slice(0,80);
-          if(amt<0)expenseEntry({date:d,memo:memo,cents:-amt,source:'bank-import'});else{var m=b&&b.invoices.filter(function(i){return Math.round(i.amount*100)===amt})[0];if(m){matched++;memo+=' (matches '+m.id+')'}incomeEntry({date:d,memo:memo,cents:amt,source:'bank-import',acct:m?svcAcct(m.desc):'4999'})}n++});
-        save();o.textContent=n+' draft(s) created, '+matched+' matched to invoices by exact amount. Review them in the Review tab.'};fr.readAsText(f)};
-  }
-  function filterBar(){return '<div class="bp-form" style="max-width:560px"><div><label for="rp-f">From</label><input id="rp-f" type="date" value="'+range.f+'"></div><div><label for="rp-t">To</label><input id="rp-t" type="date" value="'+range.t+'"></div><div><label for="rp-c">Currency</label><select id="rp-c"><option>USD</option></select></div></div>'}
-  function pReports(p){
-    var r=report(range.f,range.t),b=bill(),ag=[0,0,0,0];
-    if(b)b.invoices.filter(function(i){return i.status==='unpaid'}).forEach(function(i){var late=Math.floor((Date.now()-new Date(i.due))/864e5),c=Math.round(i.amount*100);ag[late<=0?0:late<=30?1:late<=60?2:3]+=c});
-    function lines(a){return a.map(function(x){return '<tr><td>'+esc(x.code+' '+x.name)+'</td><td class="num">'+money(x.v)+'</td></tr>'}).join('')}
-    function tot(l,v){return '<tr><td><strong>'+l+'</strong></td><td class="num"><strong>'+money(v)+'</strong></td></tr>'}
-    var bs=r.bs;
-    var h=filterBar()+'<div class="bk-grid"><div><h3 class="sec">Profit &amp; Loss</h3>'+table(['Account','#Amount'],[lines(r.revenue),tot('Total revenue',r.totalRevenue),lines(r.expenses.filter(function(x){return x.v})),tot('Total expenses',r.totalExpenses),tot('Profit',r.profit)])+'</div>'
-      +'<div><h3 class="sec">Cash flow</h3>'+table(['Item','#Amount'],[tot('Money in',r.cashIn),tot('Money out',r.cashOut),tot('Net change',r.cashNet),tot('Cash position now',r.cashPosition)])+'</div>'
-      +'<div><h3 class="sec">Balance sheet'+(range.t?' at '+esc(range.t):'')+'</h3>'+table(['Account','#Amount'],[lines(bs.assets),tot('Total assets',bs.totalAssets),lines(bs.liabilities),lines(bs.equity),'<tr><td>Current earnings</td><td class="num">'+money(bs.earnings)+'</td></tr>',tot('Liabilities and equity',bs.totalLiabLE)])+(bs.totalAssets===bs.totalLiabLE?'<p class="bk-note">Balanced: assets equal liabilities plus equity.</p>':'<p class="bk-flag">Does not balance. Check for entries with accounts of an unexpected type.</p>')+'</div>'
-      +'<div><h3 class="sec">Receivables ageing</h3>'+table(['Bucket','#Amount'],[['Not yet due',ag[0]],['1 to 30 days late',ag[1]],['31 to 60 days late',ag[2]],['Over 60 days late',ag[3]]].map(function(x){return '<tr><td>'+x[0]+'</td><td class="num">'+money(x[1])+'</td></tr>'}))+'</div>'
-      +'<div><h3 class="sec">Revenue by service</h3>'+(r.revenue.length?bars(r.revenue.map(function(x){return [x.name,x.v]}),Math.max.apply(null,r.revenue.map(function(x){return x.v}).concat([1]))):'')+'</div>'
-      +'<div><h3 class="sec">Expenses by category</h3>'+bars(r.expenses.filter(function(x){return x.v>0}).map(function(x){return [x.name,x.v]}),Math.max.apply(null,r.expenses.map(function(x){return x.v}).concat([1])))+'</div></div>'
-      +'<p class="al-bar"><button class="btn small" id="rp-csv" type="button">Export P&amp;L CSV</button></p><p class="bk-note">Only approved entries are counted. Excel and PDF export and "send to my accountant" need the backend step; CSV works now. This is a bookkeeping aid, not a substitute for a qualified accountant.</p>';
-    p.innerHTML=h;
-    ['rp-f','rp-t'].forEach(function(id){document.getElementById(id).onchange=function(){range.f=document.getElementById('rp-f').value;range.t=document.getElementById('rp-t').value;render()}});
-    document.getElementById('rp-csv').onclick=function(){exportCsv([['account','amount']].concat(r.revenue.map(function(x){return [x.name,(x.v/100).toFixed(2)]}),r.expenses.map(function(x){return [x.name,(-x.v/100).toFixed(2)]}),[['Profit',(r.profit/100).toFixed(2)]]),'vintage-pnl.csv')};
-  }
-  function pAsk(p){
-    p.innerHTML='<h3 class="sec">Ask the books</h3><div class="bk-chat"><div class="bk-row"><input type="text" id="as-q" placeholder="What was my biggest expense? How much is unpaid?" aria-label="Question about your books" maxlength="200"><button class="btn gold small" id="as-go" type="button">Ask</button></div><div class="out" id="as-out">Answers use only the calculated figures below, which you can inspect each time.</div><details id="as-det" hidden><summary>Numbers used</summary><pre id="as-num"></pre></details></div>';
-    document.getElementById('as-go').onclick=async function(){var q=document.getElementById('as-q').value.trim(),o=document.getElementById('as-out');if(!q)return;o.textContent='Thinking…';
-      var snap=snapshot('',''),b=bill();snap.unpaidInvoices=b?b.invoices.filter(function(i){return i.status==='unpaid'}).map(function(i){return [i.id,money(Math.round(i.amount*100))]}):[];snap.recentEntries=load().entries.filter(function(e){return e.status==='approved'}).slice(-12).map(function(e){return [e.date,e.memo,money(entryAmount(e))]});
-      var s=await sampler(),txt='';
-      if(s){try{var r=await s('You answer questions about a small business ledger. Use ONLY the figures in the JSON, copied exactly. Never calculate, estimate or invent. If the JSON does not contain the answer, say so. Keep it under 60 words.\nJSON: '+JSON.stringify(snap)+'\nQuestion: '+JSON.stringify(q),{cache:false,modelTier:'quick'});txt=r.text||''}catch(e){}}
-      if(!txt)txt='AI answers are not available in this view. Here are the calculated figures instead.';
-      o.textContent=txt+(unverified(txt,snap)?'\n\nCheck: some numbers above could not be matched to the figures used.':'');document.getElementById('as-det').hidden=false;document.getElementById('as-num').textContent=JSON.stringify(snap,null,1)};
-  }
-  function pSettings(p){
-    var S=load();
-    var h='<h3 class="sec">Chart of accounts</h3>'+table(['Code','Name','Type'],S.accounts.map(function(a){return '<tr><td>'+esc(a.code)+'</td><td>'+esc(a.name)+'</td><td>'+a.type+'</td></tr>'}))+'<form class="bp-form" id="st-a"><div><label for="sa-c">Code</label><input id="sa-c" required pattern="\\d{4}"></div><div><label for="sa-n">Name</label><input id="sa-n" required maxlength="40"></div><div><label for="sa-t">Type</label><select id="sa-t"><option>asset</option><option>liability</option><option>equity</option><option>revenue</option><option>expense</option></select></div><div><button class="btn small" type="submit">Add account</button></div></form>';
-    h+='<h3 class="sec">Categorisation rules</h3>'+table(['If text contains','Use account'],S.rules.map(function(r){return '<tr><td>'+esc(r.kw)+'</td><td>'+esc(aname(r.acct))+'</td></tr>'}))+'<form class="bp-form" id="st-r"><div><label for="sr-k">Text</label><input id="sr-k" required maxlength="40" placeholder="e.g. Meta Ads"></div><div><label for="sr-a">Account</label><select id="sr-a">'+acctOpts(['expense','revenue'],'5000')+'</select></div><div><button class="btn small" type="submit">Add rule</button></div></form>';
-    h+='<h3 class="sec">Checks and tax</h3><form class="bp-form" id="st-s"><div><label for="ss-l">Flag amounts from (USD)</label><input id="ss-l" type="number" min="1" value="'+S.settings.large/100+'"></div><div><label for="ss-v">VAT rate % (placeholder)</label><input id="ss-v" type="number" min="0" step="0.5" value="'+S.settings.vat+'"></div><div><label><input id="ss-on" type="checkbox" style="width:auto;min-height:0"'+(S.settings.vatOn?' checked':'')+'> Show VAT option on income</label></div><div><button class="btn small" type="submit">Save</button></div></form>';
-    h+='<p class="bk-note">Currency: USD, rate 1, recorded on every entry. <button class="btn mini" id="st-reset" type="button">Reset demo books</button></p>';
-    p.innerHTML=h;
-    document.getElementById('st-a').onsubmit=function(e){e.preventDefault();var c=document.getElementById('sa-c').value.trim();if(acct(c)){toast('That code already exists.');return}S.accounts.push({code:c,name:document.getElementById('sa-n').value.trim(),type:document.getElementById('sa-t').value});log('add account '+c);save();render()};
-    document.getElementById('st-r').onsubmit=function(e){e.preventDefault();S.rules.unshift({kw:document.getElementById('sr-k').value.trim(),acct:document.getElementById('sr-a').value});log('add rule');save();render()};
-    document.getElementById('st-s').onsubmit=function(e){e.preventDefault();S.settings.large=Math.round(+document.getElementById('ss-l').value*100)||50000;S.settings.vat=+document.getElementById('ss-v').value||0;S.settings.vatOn=document.getElementById('ss-on').checked;log('update settings');save();toast('Saved.');render()};
-    document.getElementById('st-reset').onclick=function(){mem=null;try{localStorage.removeItem(KEY)}catch(e){}load();render()};
-  }
-  async function openBooks(){
-    view.classList.add('show');document.body.style.overflow='hidden';body.innerHTML='<p class="lead">Loading…</p>';
-    var c=window.__V;if(c)await c.capsReady;
-    if(!c||!c.cap.owner){body.innerHTML='<div class="al-banner">This page is for the site owner. Sign in to claude.ai with the owner account to open it.</div>';return}
-    load();render();
-  }
-  function closeBooks(){view.classList.remove('show');document.body.style.overflow='';if(location.hash==='#admin-books')history.replaceState(null,'',location.pathname+location.search)}
-  document.getElementById('bk-x').addEventListener('click',closeBooks);
-  function route(){if(location.hash==='#admin-books')openBooks();else if(view.classList.contains('show')){view.classList.remove('show');if(!/^#(terms|privacy|refunds|admin-leads|portal|admin-billing|pay-)/.test(location.hash))document.body.style.overflow=''}}
-  if(!API.on){addEventListener('hashchange',route);route()}
-})();
-</script>
 
 <script>
 /* ===== MILESTONE 5: screens that talk to the backend (sign-in, portal, billing, leads, Books) ===== */
@@ -1474,8 +1087,11 @@ window.API=(function(){
     if(!u.emailVerified)h+=note('Please confirm your email address to order and pay. We sent a link to '+esc(u.email)+'. <button class="btn mini" id="rv" type="button">Send it again</button>');
     h+='<div class="bp-cards"><div class="bp-card"><small>Active services</small><b>'+active.length+'</b></div><div class="bp-card"><small>Next billing</small><b>'+(nxt?fmt(nxt):'-')+'</b></div><div class="bp-card"><small>Outstanding</small><b>'+cents(owed)+'</b></div></div>';
     h+='<h3 class="sec">Services</h3><div class="al-table"><table><thead><tr><th>Service</th><th>Price</th><th>Status</th><th>Next billing</th><th></th></tr></thead><tbody>';
-    if(!subs.length)h+='<tr><td colspan="5">No services yet. Choose a package in the pricing section.</td></tr>';
+    if(!subs.length)h+='<tr><td colspan="5">No services yet. Choose a package below.</td></tr>';
     subs.forEach(function(x){var mk=/^Marketing /.test(x.plan);h+='<tr><td><strong>'+esc(x.plan)+'</strong></td><td>'+usd(x.amount)+' / month</td><td><span class="st '+esc(x.status)+'">'+esc(x.status)+'</span></td><td>'+(x.status==='cancelled'?'-':fmt(x.next))+'</td><td><div class="bp-act">'+(x.status==='cancelled'?'':(mk?'<select data-chg="'+esc(x.id)+'" aria-label="Change plan">'+['Essential','Growth','Scale'].map(function(n){return '<option'+(x.plan==='Marketing '+n?' selected':'')+'>Marketing '+n+'</option>'}).join('')+'</select>':'')+'<button class="btn mini" data-cx="'+esc(x.id)+'" type="button">Cancel</button>')+'</div></td></tr>'});
+    h+='</tbody></table></div>';
+    h+='<h3 class="sec">Order a package</h3><p class="lead">Pick a package and we create your invoice straight away. You pay by bank transfer and upload your receipt here.</p><div class="al-table"><table><thead><tr><th>Package</th><th>Price</th><th></th></tr></thead><tbody>';
+    Object.keys(CONFIG.pricing).forEach(function(k){var c=CONFIG.pricing[k];c.plans.forEach(function(p){var once=p.once!=null;h+='<tr><td><strong>'+esc(c.label+' '+p.name)+'</strong></td><td>'+usd(once?p.once:p.month)+(once?' one-time':' / month')+'</td><td><button class="btn mini" type="button" data-buy="'+esc(k+':'+p.name)+'">Order</button></td></tr>'})});
     h+='</tbody></table></div>';
     if(d.projects&&d.projects.length){
       h+='<h3 class="sec">Project payments</h3>'+d.projects.map(function(p){
@@ -1517,6 +1133,17 @@ window.API=(function(){
     for(var i=0;i<keys.length;i++){var c=CONFIG.pricing[keys[i]];if(plan.indexOf(c.label+' ')===0)return {category:keys[i],plan:plan.slice(c.label.length+1),billing:/month/i.test(pr)?'month':'once',label:plan}}
     return null;
   }
+  function buyOrder(key){
+    var a=String(key||'').split(':'),c=CONFIG.pricing[a[0]];if(!c)return null;
+    var p=c.plans.filter(function(x){return x.name===a[1]})[0];if(!p)return null;
+    return {category:a[0],plan:p.name,billing:p.once!=null?'once':'month',label:c.label+' '+p.name};
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-buy]');if(!b)return;
+    var o=buyOrder(b.getAttribute('data-buy'));if(!o)return;
+    if(!confirm('Order '+o.label+'? We will create your invoice now.'))return;
+    placeOrder(o);
+  });
   async function placeOrder(o){
     try{
       var r=await API.post('/api/portal/orders',{category:o.category,plan:o.plan,billing:o.billing});
@@ -1928,6 +1555,9 @@ window.API=(function(){
     var h=location.hash,m;
     if((m=h.match(/^#order-(CO-\d+)$/)))return openCustomOrder(m[1]);
     if(h==='#admin-orders')return openOrders();
+    if((m=h.match(/^#buy=(.+)$/))){var bo=buyOrder(decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname+location.search+'#portal');if(!bo){toast('We could not find that package.');return openPortal()}
+      if(!API.user||API.user.role!=='client'){pending=bo;return openPortal()}
+      return placeOrder(bo)}
     if((m=h.match(/^#verify=(.+)$/)))return doVerify(decodeURIComponent(m[1]));
     if((m=h.match(/^#reset=(.+)$/)))return showReset(decodeURIComponent(m[1]));
     var paid=new URLSearchParams(location.search).get('paid');

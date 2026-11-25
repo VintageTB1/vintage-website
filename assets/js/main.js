@@ -2,6 +2,8 @@
    Rules: animate transform and opacity only; respect prefers-reduced-motion; never block content if a library fails. */
 (function () {
   'use strict';
+  /* Emailed confirm/reset links from before the portal moved to /app/ land here: forward them. */
+  if (/^#(verify|reset)=/.test(location.hash) && location.pathname.indexOf('/app/') !== 0) { location.replace('/app/' + location.hash); return; }
   var doc = document, root = doc.documentElement;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -78,7 +80,17 @@
   function backend() { return (cfg.backend || '').replace(/\/$/, ''); }
   function post(path, data) {
     return fetch(backend() + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error((j && j.error && j.error.message) || 'Something went wrong. Please try again.'); e.fields = j && j.error && j.error.fields; throw e; } return j; }); });
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) {
+          var nested = j && j.error && typeof j.error === 'object' ? j.error : null;
+          var fields = (j && j.fields) || (nested && nested.fields) || null;
+          var text = (j && typeof j.message === 'string' && j.message) || (nested && nested.message) || 'Something went wrong. Please try again.';
+          if (fields && typeof fields === 'object') {
+            var list = Object.keys(fields).map(function (k) { return fields[k]; }).filter(function (v) { return typeof v === 'string'; });
+            if (list.length) text = list.join(' ');
+          }
+          if (r.status === 429) text = 'Too many attempts. Please wait a few minutes and try again.';
+          var e = new Error(text); e.fields = fields; e.status = r.status; throw e;
+        } return j; }); }, function () { throw new Error('We could not reach the server. Please check your connection and try again.'); });
   }
   window.vaPost = post;
   $$('form[data-contact]').forEach(function (form) {
