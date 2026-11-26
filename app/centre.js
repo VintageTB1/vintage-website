@@ -252,7 +252,7 @@
         if ((t = e.target.closest('[data-act2]'))) { var a = t.getAttribute('data-act2').split('|'); if (a[1] === 'off' && !confirm('Switch this person off? They will be signed out and cannot sign in.')) return; patch('/api/admin/team/' + a[0], { active: a[1] === 'on' }, function () { again(); }); return; }
         var l = e.target.closest('[data-go]'); if (l) { e.preventDefault(); go(l.getAttribute('data-go')); }
       };
-      body.onchange = function (e) { var s = e.target, id = s.getAttribute('data-role'); if (id && confirm('Change this person\'s role? They will be signed out and must sign in again.')) patch('/api/admin/team/' + id, { role: s.value }, function () { again(); }); else again(); };
+      body.onchange = function (e) { var s = e.target, id = s.getAttribute('data-role'); if (!id) return; if (confirm('Change this person\'s role? They will be signed out and must sign in again.')) patch('/api/admin/team/' + id, { role: s.value }, function () { again(); }); else again(); };
     }, function (e) { if (!stale(g)) fail(e); });
   }
 
