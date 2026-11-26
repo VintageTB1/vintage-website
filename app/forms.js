@@ -15,7 +15,7 @@
   function kb(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
   function q(sel, r) { return (r || document).querySelector(sel); }
   function qa(sel, r) { return Array.prototype.slice.call((r || document).querySelectorAll(sel)); }
-  function debounce(fn, ms) { var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); }; }
+  function debounce(fn, ms) { var t; var f = function () { clearTimeout(t); t = setTimeout(fn, ms); }; f.cancel = function () { clearTimeout(t); }; return f; }
   function saveBlob(blob) { var u = URL.createObjectURL(blob); window.open(u, '_blank'); setTimeout(function () { URL.revokeObjectURL(u); }, 60000); }
   function openDoc(path) { API.call('GET', path, undefined, { blob: true }).then(saveBlob, function (e) { toast(API.text(e)); }); }
   function pill(text, tone) { return '<span class="vf-pill vf-' + (tone || 'grey') + '">' + esc(text) + '</span>'; }
@@ -158,7 +158,7 @@
     if (f.type === 'textarea') return wrap('<textarea id="vf-' + f.id + '" data-id="' + f.id + '" maxlength="' + (f.max || 4000) + '"' + dis + '>' + esc(v || '') + '</textarea>');
     if (['text', 'email', 'tel', 'date', 'number', 'url'].indexOf(f.type) >= 0) {
       var sg = !v && S.suggest && S.suggest[f.id] ? S.suggest[f.id] : '';
-      return wrap((f.prefix ? '<span class="vf-h">' + esc(f.prefix) + '</span>' : '') + '<input type="' + (f.type === 'number' ? 'text' : f.type) + '" id="vf-' + f.id + '" data-id="' + f.id + '" value="' + esc(v || sg) + '" ' + (f.placeholder ? 'placeholder="' + esc(f.placeholder) + '" ' : '') + (f.type === 'number' ? 'inputmode="decimal" ' : '') + 'maxlength="' + (f.max || 300) + '"' + dis + '>' + (sg && !v ? '<p class="vf-h">Filled in from your earlier answer. Check it and change it if needed.</p>' : ''));
+      return wrap((f.prefix ? '<span class="vf-h">' + esc(f.prefix) + '</span>' : '') + '<input type="' + (f.type === 'number' ? 'text" inputmode="decimal' : f.type) + '" id="vf-' + f.id + '" data-id="' + f.id + '" value="' + esc(v || sg) + '" ' + (f.placeholder ? 'placeholder="' + esc(f.placeholder) + '" ' : '') + (f.type === 'number' ? 'inputmode="decimal" ' : '') + 'maxlength="' + (f.max || 300) + '"' + dis + '>' + (sg && !v ? '<p class="vf-h">Filled in from your earlier answer. Check it and change it if needed.</p>' : ''));
     }
     if (f.type === 'radio' || f.type === 'checks') {
       var multi = f.type === 'checks', cur = multi ? (Array.isArray(v) ? v : []) : (v || '');
@@ -293,7 +293,7 @@
     });
     q('#vf-submit').onclick = function () {
       var btn = this, consents = qa('[data-consent]').map(function (c) { return c.checked; });
-      btn.disabled = true;
+      btn.disabled = true; save.cancel();
       API.post(base + '/submit', { answers: collect(root, S.def), consents: consents, signedName: q('#vf-sign').value }).then(function () {
         toast(agreement ? 'Agreement signed. Thank you.' : 'Form sent. Thank you.'); route();
       }, function (e) {
@@ -344,8 +344,8 @@
       body.innerHTML = h;
       var again = function (r) { if (!stale(g)) route(); };
       var b;
-      if ((b = q('#ho-approve'))) b.onclick = function () { b.disabled = true; API.post('/api/portal/handovers/' + id + '/approve', { signedName: q('#ho-name').value }).then(function () { toast('Thank you. Project approved.'); again(); }, function (e) { b.disabled = false; toast(API.text(e)); }); };
-      if ((b = q('#ho-accept'))) b.onclick = function () { b.disabled = true; API.post('/api/portal/handovers/' + id + '/accept', { signedName: q('#ho-aname').value, comments: q('#ho-acom').value, confirmations: qa('[data-st]').map(function (c) { return c.checked; }) }).then(function () { toast('Handover accepted. Thank you.'); again(); }, function (e) { b.disabled = false; toast(API.text(e)); }); };
+      if ((b = q('#ho-approve'))) b.onclick = function () { var bb = this; bb.disabled = true; API.post('/api/portal/handovers/' + id + '/approve', { signedName: q('#ho-name').value }).then(function () { toast('Thank you. Project approved.'); again(); }, function (e) { bb.disabled = false; toast(API.text(e)); }); };
+      if ((b = q('#ho-accept'))) b.onclick = function () { var bb = this; bb.disabled = true; API.post('/api/portal/handovers/' + id + '/accept', { signedName: q('#ho-aname').value, comments: q('#ho-acom').value, confirmations: qa('[data-st]').map(function (c) { return c.checked; }) }).then(function () { toast('Handover accepted. Thank you.'); again(); }, function (e) { bb.disabled = false; toast(API.text(e)); }); };
       q('#ho-send').onclick = function () { var btn = this; btn.disabled = true; API.post('/api/portal/handovers/' + id + '/feedback', { kind: q('#ho-k').value, body: q('#ho-msg').value }).then(function () { toast('Sent. We will get back to you.'); again(); }, function (e) { btn.disabled = false; toast(API.text(e)); }); };
       if ((b = q('#ho-rec'))) b.onclick = function () { openDoc('/api/portal/handovers/' + id + '/acceptance'); };
       qa('[data-dl]').forEach(function (x) { x.onclick = function () { API.download('/api/portal/handovers/' + id + '/files/' + x.getAttribute('data-dl'), x.getAttribute('data-n')).catch(function (e) { toast(API.text(e)); }); }; });
@@ -386,7 +386,7 @@
       var h = '<div class="eyebrow">Admin</div><h2>' + esc(d.client.name) + '</h2><p><button class="vf-link" data-go="#admin-forms">All clients</button> ' + pill(os[0], os[1]) + ' ' + o.percent + '% - ' + esc(d.client.email) + '</p>';
       h += '<h3 class="sec">Services</h3><p class="vf-saved">Detected from orders and subscriptions. You can add services for work arranged outside the site.</p><div>' + Object.keys(SVC).map(function (k) { return '<label class="vf-opt" style="display:inline-flex;margin-right:16px"><input type="checkbox" data-svc="' + k + '"' + (d.services.services && d.services.services.indexOf(k) >= 0 || (Array.isArray(d.services) && d.services.indexOf(k) >= 0) ? ' checked' : '') + '><span>' + SVC[k] + '</span></label>'; }).join('') + '</div><p><button class="btn mini" id="ac-svc">Save services</button></p>';
       h += '<h3 class="sec">Forms</h3><div class="vf-scroll"><table class="vf-tbl"><thead><tr><th>Form</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>' + d.forms.map(function (f) {
-        return '<tr><td><b>' + esc(f.no) + ' ' + esc(f.title) + '</b></td><td>' + (f.unlocked ? fstat(f.status) : pill('Not assigned', 'grey')) + '</td><td>' + fmt(f.updatedAt) + '</td><td>' + (f.unlocked ? '<button class="btn mini" data-go="#admin-forms-' + cid + '-' + f.key + '">' + (f.kind === 'agreement' && (f.status === 'new' || f.status === 'prepared') ? 'Prepare' : 'Open') + '</button>' : '') + '</td></tr>';
+        return '<tr><td><b>' + esc(f.no) + ' ' + esc(f.title) + '</b></td><td>' + (f.unlocked ? fstat(f.status) : f.kind === 'agreement' ? pill('Not prepared', 'grey') : pill('Not assigned', 'grey')) + '</td><td>' + fmt(f.updatedAt) + '</td><td>' + (f.unlocked || f.kind === 'agreement' ? '<button class="btn mini" data-go="#admin-forms-' + cid + '-' + f.key + '">' + (f.kind === 'agreement' && (f.status === 'new' || f.status === 'prepared') ? 'Prepare' : 'Open') + '</button>' : '') + '</td></tr>';
       }).join('') + '</tbody></table></div>';
       h += '<h3 class="sec">Project handovers</h3><p><button class="btn mini" data-go="#admin-handovers">Handover Management</button></p>';
       h += '<h3 class="sec">Audit trail</h3><ul class="vf-hist">' + d.audit.slice(0, 60).map(function (x) { return '<li>' + esc(x.action) + (x.detail ? ': ' + esc(x.detail) : '') + '<small>' + fmtT(x.at) + ' - ' + esc(x.actor) + '</small></li>'; }).join('') + '</ul>';
@@ -432,15 +432,16 @@
       qa('[data-rv]').forEach(function (b) { b.onclick = function () { b.disabled = true; API.call('PATCH', base, { action: b.getAttribute('data-rv'), note: q('#vr-note').value }).then(function () { toast('Done.'); route(); }, function (e) { b.disabled = false; toast(API.text(e)); }); }; });
       var x;
       if ((x = q('#vr-doc'))) x.onclick = function () { openDoc(base + '/document'); };
-      if ((x = q('#cs-go'))) x.onclick = function () { x.disabled = true; API.post(base + '/countersign', { name: q('#cs-n').value, role: q('#cs-r').value }).then(function () { toast('Countersigned.'); route(); }, function (e) { x.disabled = false; toast(API.text(e)); }); };
+      if ((x = q('#cs-go'))) x.onclick = function () { var cb = this; cb.disabled = true; API.post(base + '/countersign', { name: q('#cs-n').value, role: q('#cs-r').value }).then(function () { toast('Countersigned.'); route(); }, function (e) { cb.disabled = false; toast(API.text(e)); }); };
       if ((x = q('#vn-add'))) x.onclick = function () { API.post(base + '/notes', { body: q('#vn-body').value }).then(function () { route(); }, function (e) { toast(API.text(e)); }); };
       if ((x = q('#vf-addline'))) x.onclick = function () { q('#vf-lines').insertAdjacentHTML('beforeend', lineRow({ service: '', plan: '', fee: '', billing: '' })); };
       if ((x = q('#vf-prepsave'))) x.onclick = function () {
+        var pb = this;
         var prep = {}; qa('[data-p]').forEach(function (i) { prep[i.getAttribute('data-p')] = i.value; });
         var lines = qa('.vf-line').map(function (r) { return { service: q('[data-l=service]', r).value, plan: q('[data-l=plan]', r).value, fee: q('[data-l=fee]', r).value, billing: q('[data-l=billing]', r).value }; });
         if (q('#vf-lines')) prep.lines = lines;
-        x.disabled = true;
-        API.post(base + '/prepare', { prepared: prep }).then(function () { toast('Saved and sent to the client.'); route(); }, function (e) { x.disabled = false; if (e.fields) showErrors(document, e.fields); toast(API.text(e)); });
+        pb.disabled = true;
+        API.post(base + '/prepare', { prepared: prep }).then(function () { toast('Saved and sent to the client.'); route(); }, function (e) { pb.disabled = false; if (e.fields) showErrors(document, e.fields); toast(API.text(e)); });
       };
     }, function (e) { if (!stale(g)) fail(e); });
   }
@@ -514,7 +515,7 @@
       qa('[data-addbtn]').forEach(function (c) { c.onclick = function () { var ph = c.getAttribute('data-addbtn'), v = q('[data-addck="' + ph + '"]').value; if (v) API.post(base + '/checklist', { phase: ph, label: v }).then(again, err); }; });
       if ((x = q('#dv-link'))) x.onclick = function () { API.post(base + '/deliverables', { kind: 'link', title: q('#dv-t').value, category: q('#dv-c').value, url: q('#dv-u').value }).then(again, err); };
       if ((x = q('#dv-text'))) x.onclick = function () { API.post(base + '/deliverables', { kind: 'text', title: q('#dv-t').value, category: q('#dv-c').value, body: q('#dv-b').value }).then(again, err); };
-      if ((x = q('#dv-f'))) x.onchange = function () { var f = x.files[0]; if (!f) return; if (!q('#dv-t').value.trim()) { toast('Give it a title first.'); x.value = ''; return; } API.upload(base + '/deliverables?kind=file&title=' + encodeURIComponent(q('#dv-t').value) + '&category=' + encodeURIComponent(q('#dv-c').value) + '&name=' + encodeURIComponent(f.name), f).then(again, err); };
+      if ((x = q('#dv-f'))) x.onchange = function () { var xf = this, f = xf.files[0]; if (!f) return; if (!q('#dv-t').value.trim()) { toast('Give it a title first.'); xf.value = ''; return; } API.upload(base + '/deliverables?kind=file&title=' + encodeURIComponent(q('#dv-t').value) + '&category=' + encodeURIComponent(q('#dv-c').value) + '&name=' + encodeURIComponent(f.name), f).then(again, err); };
       qa('[data-dd]').forEach(function (c) { c.onclick = function () { API.call('DELETE', base + '/deliverables/' + c.getAttribute('data-dd')).then(again, err); }; });
       qa('[data-dl]').forEach(function (c) { c.onclick = function () { API.call('GET', base + '/files/' + c.getAttribute('data-dl'), undefined, { blob: true }).then(saveBlob, err); }; });
       qa('[data-fb]').forEach(function (c) { c.onclick = function () { var s = c.getAttribute('data-s'), r = q('#fb-r').value; if (s === 'declined' && !r.trim()) { toast('Type the reason in the reply box first.'); return; } API.post(base + '/feedback/' + c.getAttribute('data-fb'), { status: s, resolution: r }).then(again, err); }; });
